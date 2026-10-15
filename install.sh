@@ -105,8 +105,8 @@ dest=$HOME/.cursor/plugins/local/hypr-hands
 if ((LINK)); then
   if [[ $(readlink -f "$dest" 2>/dev/null) == "$ROOT" && ! -L $dest ]]; then echo "  this checkout IS the plugin dir; nothing to copy"
   else
-    [[ -L $dest ]] && { echo "  replacing old symlink (Cursor ignores out-of-folder symlinks)"; run "rm '$dest'"; }
-    [[ -e $dest && ! -f $dest/.hypr-hands-installed ]] && { echo "  $dest exists and was not created by this installer; leaving it alone"; LINK=0; }
+    replaced=0; [[ -L $dest ]] && { echo "  replacing old symlink (Cursor ignores out-of-folder symlinks)"; run "rm '$dest'"; replaced=1; }
+    [[ $replaced == 0 && -e $dest && ! -f $dest/.hypr-hands-installed ]] && { echo "  $dest exists and was not created by this installer; leaving it alone"; LINK=0; }
     if ((LINK)) && ask "Copy plugin to $dest?" y; then
       if command -v rsync >/dev/null; then run "mkdir -p '$dest' && rsync -a --delete --exclude .git '$ROOT/' '$dest/' && touch '$dest/.hypr-hands-installed'"
       else run "rm -rf '$dest' && mkdir -p '$dest' && cp -a '$ROOT/.' '$dest/' && rm -rf '$dest/.git' && touch '$dest/.hypr-hands-installed'"; fi
