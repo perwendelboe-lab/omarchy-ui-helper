@@ -11,6 +11,8 @@ description: >-
   commands. Excludes Omarchy source development through omarchy dev link
   workflows.
 ---
+
+<!-- Adapted from Omarchy (https://github.com/basecamp/omarchy), MIT, Copyright (c) David Heinemeier Hansson. See LICENSE in this folder. -->
 # Omarchy Skill
 
 > **Remote use (Grok Bot):** run every command here via Shell with the user's Omarchy `machineId` (from `ListMachines`), and read/edit their files with Read/Shell on that machine. `sudo`/`pkexec` prompts can't be answered remotely — give the user the command to run instead.

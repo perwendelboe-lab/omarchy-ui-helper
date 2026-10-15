@@ -134,6 +134,17 @@ Omarchy 4.0.0 (dev), Hyprland 0.56.2 (Lua config), eDP-1 1920×1080 @1.5, wlrctl
 
 Runtime output stays out of the repo: screenshots/OCR in `$XDG_RUNTIME_DIR/hypr-hands`, caches in `$XDG_CACHE_HOME/hypr-hands`. Before committing, run `scripts/privacy-check.sh` (staged files) or `--all`, or install it as a hook: `ln -sf ../../scripts/privacy-check.sh .git/hooks/pre-commit`. Put personal patterns (your email, hostname, machine IDs) in `~/.config/hypr-hands/privacy-patterns`, not in the repo.
 
+## Credits & third-party
+
+hypr-hands is an independent project, not affiliated with or endorsed by any of these:
+
+- [Omarchy](https://github.com/basecamp/omarchy) (MIT, © David Heinemeier Hansson): `skills/omarchy` is copied and adapted from Omarchy's bundled agent skill; their notice is in `skills/omarchy/LICENSE`.
+- [Cua Driver](https://github.com/trycua/cua) (MIT, © Cua AI, Inc.): optional. It is downloaded from Cua's official installer, not bundled.
+- [Hyprland](https://github.com/hyprwm/Hyprland) (BSD-3-Clause).
+- Tools installed as system packages, not redistributed: [wlrctl](https://git.sr.ht/~brocellous/wlrctl) (MIT), [wtype](https://github.com/atx/wtype) (MIT), [grim](https://git.sr.ht/~emersion/grim) (MIT), [tesseract](https://github.com/tesseract-ocr/tesseract) (Apache-2.0), [ydotool](https://github.com/ReimuNotMoe/ydotool) (AGPL-3.0, opt-in).
+
+Details: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 ## License
 
-MIT © 2026 PWN. The bundled `omarchy` skill is adapted from Omarchy (MIT). Cua Driver is a separate project by trycua under its own license.
+MIT © 2026 PWN, except `skills/omarchy/` (MIT, © David Heinemeier Hansson; see THIRD_PARTY_NOTICES.md).

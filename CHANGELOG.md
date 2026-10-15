@@ -2,6 +2,11 @@
 
 All notable changes to hypr-hands. Versions follow SemVer.
 
+## 0.3.3 — 2026-10-15
+### Added
+- `THIRD_PARTY_NOTICES.md` and `skills/omarchy/LICENSE` with Omarchy's MIT notice (the omarchy skill is copied/adapted from Omarchy).
+- README "Credits & third-party" section: Omarchy, Cua, Hyprland, wlrctl, wtype, grim, tesseract, ydotool and their licenses; unaffiliated; Cua is fetched from its official installer, not bundled.
+
 ## 0.3.2 — 2026-10-15
 ### Added
 - `.gitignore` for secrets (`.env*`, keys), logs, screenshots/OCR/runtime output, state/cache dirs, OS and editor files.
