@@ -21,7 +21,7 @@ On the machine you get `~/.local/share/hypr-hands/scripts/*.sh` and a `hypr-hand
 
 ## Quick start
 
-1. **Create the bot** from the Grok Bot template: TEMPLATE_LINK
+1. **Create the bot** from the Grok Bot template: https://x.ai/bot/34-oSa3xbDgnKAt8G_nq_
 2. **Connect your Omarchy computer** to Grok Bot (install the Grok Bot desktop app on it and register the machine).
 3. **Ask the bot to set itself up.** It runs the installer on your machine for you (`install.sh --yes --no-packages`) and tells you the one-line `sudo pacman …` / `yay …` command for anything missing (sudo needs your terminal).
 
