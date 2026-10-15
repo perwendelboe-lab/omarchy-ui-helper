@@ -3,11 +3,29 @@
   "displayName": "Hypr Hands",
   "version": "0.2.0",
   "description": "Computer use for Omarchy/Hyprland (Wayland): observe, point, click, scroll, drag, type, read the screen and manage windows, plus Cua Driver and Omarchy skills.",
-  "author": { "name": "PWN" },
+  "author": {
+    "name": "PWN"
+  },
   "license": "MIT",
-  "keywords": ["hyprland", "omarchy", "wayland", "computer-use", "automation", "linux", "cua-driver", "arch"],
+  "keywords": [
+    "hyprland",
+    "omarchy",
+    "wayland",
+    "computer-use",
+    "automation",
+    "linux",
+    "cua-driver",
+    "arch"
+  ],
   "category": "automation",
-  "tags": ["hyprland", "omarchy", "linux", "computer-use"],
+  "tags": [
+    "hyprland",
+    "omarchy",
+    "linux",
+    "computer-use"
+  ],
   "logo": "assets/logo.png",
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "homepage": "https://github.com/perwendelboe-lab/omarchy-ui-helper",
+  "repository": "https://github.com/perwendelboe-lab/omarchy-ui-helper"
 }

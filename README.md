@@ -29,7 +29,7 @@ Scripts (`scripts/`, bash, JSON output): `check` `setup` `geom` `describe` `move
 ## Quick install
 
 ```bash
-git clone https://github.com/<you>/hypr-hands ~/code/hypr-hands
+git clone https://github.com/perwendelboe-lab/omarchy-ui-helper ~/code/hypr-hands
 cd ~/code/hypr-hands
 ./install.sh --dry-run     # see exactly what would happen
 ./install.sh               # interactive; or --yes for defaults (optional steps off)
