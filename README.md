@@ -45,9 +45,13 @@ Set `HYPR_HANDS_REQUIRE_CLASS=<prefix>` and `click.sh`, `scroll.sh`, `type.sh` a
 | move.sh (Lua `hl.dsp.cursor.move`) + ±2px verify | tested |
 | click.sh left/right/middle via `wlrctl pointer click` | tested (foot mouse log + GTK4 button) |
 | scroll.sh up/down/left/right via `wlrctl pointer scroll <dy> <dx>`, step = 15 units (one libinput notch) | tested |
-| drag.sh | ydotool-only (wlrctl has no press/hold); not tested |
+| drag.sh: Lua absolute moves + `ydotool click 0x40/0x80` (needs HYPR_HANDS_ALLOW_UINPUT=1, ydotoold) | tested (GTK4 GestureDrag 100,150 → 400,450 exact) |
+| click.sh ydotool fallback when wlrctl absent | tested |
 | type.sh / key.sh (wtype, chords incl. ctrl+shift) | tested |
 | shot.sh full, ocr-find.sh, clip.sh, geom/describe/check | tested |
 | windows.sh list/focus/move/fullscreen/close | tested |
 | omarchy-menus: `omarchy-menu-keybindings` → type filter → Return | tested (toggled fullscreen) |
 | shot.sh region/select/window, hypruse backend | not tested |
+
+### ydotool (opt-in)
+`sudo pacman -S ydotool`, give your user `/dev/uinput` access (e.g. udev rule `KERNEL=="uinput", GROUP="input", MODE="0660"` + `input` group), then `systemctl --user enable --now ydotool.service`. The Arch user unit's socket is `$XDG_RUNTIME_DIR/.ydotool_socket`; `lib.sh` finds it (or honours `$YDOTOOL_SOCKET`, then `/tmp/.ydotool_socket`).

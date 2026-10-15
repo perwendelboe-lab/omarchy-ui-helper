@@ -20,3 +20,11 @@ guard_target(){
     | sort_by(.fullscreen|not) | sort_by(.focusHistoryID) | .[0].class // ""')
   [[ $under == "$pre"* ]] || die "guard: window under cursor '$under' is not $pre*" 8
 }
+# ydotool client: socket is $YDOTOOL_SOCKET, else $XDG_RUNTIME_DIR/.ydotool_socket (Arch user unit), else /tmp/.ydotool_socket
+ydo(){
+  if [[ -z ${YDOTOOL_SOCKET:-} ]]; then
+    for s in "${XDG_RUNTIME_DIR:-/run/user/$UID}/.ydotool_socket" /tmp/.ydotool_socket; do [[ -S $s ]] && { export YDOTOOL_SOCKET=$s; break; }; done
+  fi
+  [[ -S ${YDOTOOL_SOCKET:-} ]] || die "ydotoold socket not found; run: systemctl --user enable --now ydotool.service" 5
+  ydotool "$@" >/dev/null
+}

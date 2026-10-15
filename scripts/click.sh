@@ -12,6 +12,6 @@ guard_target
 case $backend in
   wlrctl) wlrctl pointer click "$btn" ;;   # man wlrctl: pointer click [left|right|middle]
   hypruse) hypruse click --button "$btn" ;;
-  ydotool) case $btn in left) c=0xC0;; right) c=0xC1;; middle) c=0xC2;; esac; ydotool click "$c" ;;
+  ydotool) case $btn in left) c=0xC0;; right) c=0xC1;; middle) c=0xC2;; esac; ydo click "$c" ;;
 esac
 c=$(cursor); jq -nc --arg b "$backend" --arg btn "$btn" --arg c "$c" '{ok:true,backend:$b,button:$btn,cursor:$c}'
