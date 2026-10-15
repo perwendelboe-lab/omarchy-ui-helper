@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "hypr-hands",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Omarchy UI Helper: Grok Bot skills + scripts for driving Omarchy/Hyprland (Wayland) desktops remotely - observe, point, click, scroll, drag, type, read the screen and manage windows, plus Cua Driver and Omarchy skills.",
   "author": {
     "name": "PWN"

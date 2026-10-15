@@ -20,6 +20,9 @@ Omarchy stable (4.0.x) and edge/dev both use Hyprland 0.56 with Lua config (`hyp
 2. One small action at a time.
 3. Verify (`describe`, new screenshot, `wait-window CLASS`). Never chain blind actions.
 
+## Window management
+`hypr-hands windows list|focus|move|fullscreen|close|float|resize|moveto|center|swap|movedir|focusdir|pseudo|split|snapshot|restore` (skill `hypr-windows` has the syntax). Before any rearranging, run `hypr-hands windows snapshot` and note the file; afterwards offer the user `hypr-hands windows restore FILE` to undo. Verify each change with `hypr-hands windows list`.
+
 ## Safety rules
 - Ask before taking over the user's pointer/keyboard (they may be using the machine).
 - Set `HYPR_HANDS_REQUIRE_CLASS=<target class prefix>` on every input command: scripts refuse (exit 8) unless the focused window — and for pointer actions the window under the cursor — matches.
@@ -27,4 +30,4 @@ Omarchy stable (4.0.x) and edge/dev both use Hyprland 0.56 with Lua config (`hyp
 - Verify cursor position before clicks (`click left X Y` does it, ±2px).
 - Never type secrets (`type` refuses secret-looking text).
 - ydotool/uinput is opt-in. Never run sudo/pacman/yay yourself (no TTY; they hang) — give the user the command.
-- Don't close or move windows you didn't open; record and restore the cursor position.
+- Don't close or move windows you didn't open (ask first); snapshot before rearranging and offer restore after; record and restore the cursor position and focus.

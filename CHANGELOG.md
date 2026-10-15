@@ -2,6 +2,13 @@
 
 All notable changes to hypr-hands. Versions follow SemVer.
 
+## 0.4.0 — 2026-10-15
+### Added
+- `windows float [ADDR] [toggle|on|off]`, `resize [ADDR] W H` (exact) / `+DX +DY` (relative), `moveto [ADDR] X Y`, `center [ADDR]`, `swap [ADDR] l|r|u|d`, `movedir [ADDR] l|r|u|d`, `focusdir l|r|u|d`, `pseudo [ADDR]`, `split [ADDR]`; Lua (`hl.dsp.window.float/resize/move/swap/center/pseudo`, `hl.dsp.focus({direction})`, `hl.dsp.layout('togglesplit')`) and classic (`togglefloating/setfloating/settiled`, `resizewindowpixel`, `movewindowpixel`, `swapwindow`, `movewindow`, `movefocus`, `centerwindow`, `pseudo`, `togglesplit`) forms in `lib.sh`.
+- `windows snapshot [FILE]` / `windows restore [FILE]`: layout undo saved in `$XDG_STATE_HOME/hypr-hands/layout-*.json`.
+### Changed
+- `hypr-windows` and `hypr-computer-use` skills: snapshot before rearranging, offer restore afterwards.
+
 ## 0.3.3 — 2026-10-15
 ### Added
 - `THIRD_PARTY_NOTICES.md` and `skills/omarchy/LICENSE` with Omarchy's MIT notice (the omarchy skill is copied/adapted from Omarchy).

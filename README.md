@@ -10,7 +10,7 @@ A Grok Bot template plus the **hypr-hands** toolkit (skills + bash scripts, Agen
 |---|---|
 | `hypr-computer-use` | The overall loop: run on your machine via Shell + machineId, Cua Driver first, pointer fallback, observe → act → verify, safety rules |
 | `hypr-pointer` | Verified cursor moves, clicks, scrolls, drags |
-| `hypr-windows` | List / focus / move to workspace / fullscreen / close via Hyprland Lua dispatch |
+| `hypr-windows` | List / focus / move / fullscreen / close, float-tile, resize, move-to, center, swap, directional move/focus, pseudo, split, layout snapshot + restore (Lua or classic dispatch) |
 | `omarchy-menus` | Keyboard-driven Omarchy menus (keybindings menu → filter → Return) |
 | `screen-read` | Screenshots, OCR text location, clipboard, desktop summary |
 | `cua-driver-local-computer-use` | Driving native apps with `cua-driver` (AT-SPI element tokens, sessions) |
@@ -84,6 +84,10 @@ Update: `cua-driver update --apply && systemctl --user restart cua-driver.servic
   ```
 - **Undo:** `./uninstall.sh --ydotool`.
 
+## Window layouts: snapshot / restore
+
+`hypr-hands windows snapshot [FILE]` saves every window's address, class, workspace, floating, fullscreen, position and size to `$XDG_STATE_HOME/hypr-hands/layout-*.json` (read-only). `hypr-hands windows restore [FILE]` (default: newest) puts back workspaces, floating/tiled state, fullscreen, and position/size of floating windows; tiled geometry follows the layout (best effort). The skills snapshot before rearranging and offer restore afterwards.
+
 ## Update checks + weekly routine
 
 - `hypr-hands update-check [--json] [--apply]` — cua-driver, Omarchy (incl. dev channel), Hyprland, wlrctl, ydotool and hypr-hands itself (installed copy or clone vs GitHub `main`); flags major bumps. `--apply` only runs the sudo-free `cua-driver update --apply`.
@@ -102,7 +106,7 @@ Update: `cua-driver update --apply && systemctl --user restart cua-driver.servic
 
 | Symptom | Fix |
 |---|---|
-| `hyprctl dispatch movecursor 100 100` → Lua `')' expected` | Lua-config Hyprland routes `dispatch` through `hl.dispatch`. Use `hyprctl repl "hl.dispatch(hl.dsp.cursor.move({ x = 100, y = 100 })); return 'ok'"` (named fields). Also `hl.dsp.focus({ window = 'address:0x…' })`, `hl.dsp.window.move({ workspace = '3', follow = false })`, `hl.dsp.window.fullscreen()`, `hl.dsp.window.close()`. |
+| `hyprctl dispatch movecursor 100 100` → Lua `')' expected` | Lua-config Hyprland routes `dispatch` through `hl.dispatch`. Use `hyprctl repl "hl.dispatch(hl.dsp.cursor.move({ x = 100, y = 100 })); return 'ok'"` (named fields). Also `hl.dsp.focus({ window = 'address:0x…' })`, `hl.dsp.window.move({ workspace = '3', follow = false })`, `hl.dsp.window.fullscreen()`, `hl.dsp.window.close()`, `hl.dsp.window.float({ action = 'toggle' })`, `hl.dsp.window.resize({ x, y, relative })`, `hl.dsp.window.swap({ direction = 'l' })`, `hl.dsp.layout('togglesplit')`. |
 | `/dev/uinput` not writable after setup | New login needed for the `input` group; check `id -nG`. |
 | ydotool "failed to connect socket" | Arch user unit uses `$XDG_RUNTIME_DIR/.ydotool_socket`; scripts auto-detect, else `export YDOTOOL_SOCKET=…`. |
 | `yay -S wlrctl` says "nothing to do" | Use `yay -S aur/wlrctl`. |
@@ -126,6 +130,7 @@ Omarchy 4.0.0 (dev), Hyprland 0.56.2 (Lua config), eDP-1 1920×1080 @1.5, wlrctl
 | target guard, secret refusal | ✅ · lock refusal ⚠️ not exercised live |
 | shot full, ocr-find, clip | ✅ · shot region/select/window ⚠️ untested |
 | windows list/focus/move/fullscreen/close | ✅ |
+| windows float/resize (exact+relative)/moveto/center/swap/movedir/focusdir/pseudo/split/snapshot/restore (v0.4.0) | ✅ Lua live · classic dry-run only |
 | Omarchy keybindings menu flow | ✅ |
 | install.sh (dry-run + real `--yes --no-packages`), update-check, breaking-watch | ✅ · fresh-machine install with packages ⚠️ untested |
 | hypruse backend | ⚠️ untested |

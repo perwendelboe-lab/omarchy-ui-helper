@@ -21,6 +21,7 @@ _hh_run(){
   [[ $out == *rror* || $out == *nvalid* ]] && die "dispatch error ($(dispatch_mode)): ${out:0:200}" 9; return 0; }
 hh_lua(){ _hh_run hyprctl repl "$1; return 'ok'"; }
 hh_classic(){ _hh_run hyprctl dispatch "$@"; }
+_hh_w(){ [[ -n ${1:-} ]] || return 0; [[ ${2:-} == first ]] && printf " window = 'address:%s' " "$1" || printf ", window = 'address:%s'" "$1"; }
 hh_dispatch(){ # action args... -> runs the right form for this Hyprland
   local m; m=$(dispatch_mode); _HH_MODE=$m
   case $1 in
@@ -29,6 +30,22 @@ hh_dispatch(){ # action args... -> runs the right form for this Hyprland
     to-ws) if [[ $m == lua ]]; then hh_lua "hl.dispatch(hl.dsp.window.move({ workspace = '$2', follow = false }))"; else hh_classic movetoworkspacesilent "$2"; fi ;;
     fullscreen) if [[ $m == lua ]]; then hh_lua "hl.dispatch(hl.dsp.window.fullscreen())"; else hh_classic fullscreen 0; fi ;;
     close) if [[ $m == lua ]]; then hh_lua "hl.dispatch(hl.dsp.window.close())"; else hh_classic killactive; fi ;;
+    # Window actions below take an optional address as their last argument ("" = active window).
+    float) # float ADDR [toggle|on|off]
+      if [[ $m == lua ]]; then hh_lua "hl.dispatch(hl.dsp.window.float({ action = '${3:-toggle}'$(_hh_w "$2") }))"
+      else case ${3:-toggle} in toggle) hh_classic togglefloating ${2:+"address:$2"} ;; on) hh_classic setfloating ${2:+"address:$2"} ;; off) hh_classic settiled ${2:+"address:$2"} ;; esac; fi ;;
+    resize) # resize ADDR W H exact|rel
+      if [[ $m == lua ]]; then local r=false; [[ $5 == rel ]] && r=true; hh_lua "hl.dispatch(hl.dsp.window.resize({ x = $3, y = $4, relative = $r$(_hh_w "$2") }))"
+      else local spec="$3 $4"; [[ $5 == exact ]] && spec="exact $spec"; hh_classic resizewindowpixel "$spec,address:${2:?addr}"; fi ;;
+    moveto) # moveto ADDR X Y
+      if [[ $m == lua ]]; then hh_lua "hl.dispatch(hl.dsp.window.move({ x = $3, y = $4$(_hh_w "$2") }))"
+      else hh_classic movewindowpixel "exact $3 $4,address:${2:?addr}"; fi ;;
+    swap) if [[ $m == lua ]]; then hh_lua "hl.dispatch(hl.dsp.window.swap({ direction = '$2' }))"; else hh_classic swapwindow "$2"; fi ;;
+    movedir) if [[ $m == lua ]]; then hh_lua "hl.dispatch(hl.dsp.window.move({ direction = '$2' }))"; else hh_classic movewindow "$2"; fi ;;
+    focusdir) if [[ $m == lua ]]; then hh_lua "hl.dispatch(hl.dsp.focus({ direction = '$2' }))"; else hh_classic movefocus "$2"; fi ;;
+    center) if [[ $m == lua ]]; then hh_lua "hl.dispatch(hl.dsp.window.center({$(_hh_w "$2" first)}))"; else hh_classic centerwindow; fi ;;
+    pseudo) if [[ $m == lua ]]; then hh_lua "hl.dispatch(hl.dsp.window.pseudo())"; else hh_classic pseudo; fi ;;
+    split) if [[ $m == lua ]]; then hh_lua "hl.dispatch(hl.dsp.layout('togglesplit'))"; else hh_classic togglesplit; fi ;;
     *) die "hh_dispatch: unknown action $1" 2 ;;
   esac; }
 cursor(){ hyprctl cursorpos | tr -d ' ' ; }   # "x,y" logical coords
