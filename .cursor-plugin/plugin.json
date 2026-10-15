@@ -1,0 +1,12 @@
+{
+  "name": "hypr-hands",
+  "displayName": "Hypr Hands",
+  "version": "0.1.0",
+  "description": "Computer use for Omarchy/Hyprland (Wayland): observe, point, click, type, read the screen and manage windows.",
+  "author": { "name": "PWN" },
+  "license": "MIT",
+  "keywords": ["hyprland", "omarchy", "wayland", "computer-use", "automation"],
+  "category": "automation",
+  "tags": ["hyprland", "omarchy", "linux", "computer-use"],
+  "skills": "./skills/"
+}
