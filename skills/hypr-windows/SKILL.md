@@ -1,16 +1,16 @@
 ---
 name: hypr-windows
-description: List, focus, move-to-workspace, fullscreen and wait for Hyprland windows via hyprctl Lua dispatch.
+description: List, focus, move-to-workspace, fullscreen, close and wait for windows on the user's Omarchy/Hyprland computer via hyprctl Lua dispatch.
 ---
-# Windows
-- `scripts/windows.sh list` — JSON clients (address, class, title, workspace, geometry).
-- `scripts/windows.sh focus 0xADDR`
-- `scripts/windows.sh move 0xADDR WS` — `hl.dsp.window.move({workspace=WS, follow=false})`.
-- `scripts/windows.sh fullscreen [0xADDR]`
-- `scripts/windows.sh close 0xADDR` — only for windows you opened.
-- `scripts/wait-window.sh CLASS [timeout]` — after launching an app.
-Raw: `hyprctl repl "hl.dispatch(hl.dsp.focus({ window = 'address:0x…' })); return 'ok'"`.
-Ask before rearranging the user's existing windows.
+# Windows (remote)
+Run via Shell with the user's Omarchy `machineId`.
 
-
-Tested: list, focus, move to workspace 9 (follow=false) and back, fullscreen 0→2→0, close. Note: focusing a window on another workspace switches to that workspace.
+```bash
+hypr-hands windows list                 # JSON: address, class, title, workspace, geometry
+hypr-hands windows focus 0xADDR
+hypr-hands windows move 0xADDR WS       # hl.dsp.window.move({workspace=WS, follow=false})
+hypr-hands windows fullscreen [0xADDR]  # toggle; verify .fullscreen 0/2 in `hyprctl clients -j`
+hypr-hands windows close 0xADDR         # only windows you opened
+hypr-hands wait-window CLASS [timeout]  # after launching an app
+```
+Raw form: `hyprctl repl "hl.dispatch(hl.dsp.focus({ window = 'address:0x…' })); return 'ok'"`. Focusing a window on another workspace switches to it. Ask before rearranging the user's windows; afterwards refocus what they had.

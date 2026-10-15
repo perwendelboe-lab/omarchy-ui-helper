@@ -2,6 +2,14 @@
 
 All notable changes to hypr-hands. Versions follow SemVer.
 
+## 0.3.0 — 2026-10-15
+### Changed
+- Retargeted to **Grok Bot only** (project name: Omarchy UI Helper). Skills rewritten for a bot that drives the user's Omarchy computer remotely (Shell + machineId).
+- Installs to `~/.local/share/hypr-hands` (rsync copy) with a `hypr-hands` CLI symlinked into `~/.local/bin`; no Cursor plugin folder any more. `uninstall.sh` matches (and removes the pre-0.3 `~/.cursor/plugins/local/hypr-hands` copy).
+- `update-check.sh` compares the installed copy or a local clone against GitHub `main`; works from the install dir.
+### Removed
+- `.cursor-plugin/` manifest and Cursor marketplace instructions (the Agent Plugins `plugin.json` stays).
+
 ## 0.2.0 — 2026-10-15
 ### Added
 - Bundled skills `cua-driver-local-computer-use` (genericized, with hypr-hands fallback and Hyprland Lua dispatch notes) and `omarchy` (+ topic guides, from Omarchy's own agent skill).

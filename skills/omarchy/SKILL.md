@@ -13,6 +13,8 @@ description: >-
 ---
 # Omarchy Skill
 
+> **Remote use (Grok Bot):** run every command here via Shell with the user's Omarchy `machineId` (from `ListMachines`), and read/edit their files with Read/Shell on that machine. `sudo`/`pkexec` prompts can't be answered remotely — give the user the command to run instead.
+
 Manage [Omarchy](https://omarchy.org/) Linux systems - a beautiful, fun, agentic Arch Linux distribution with Hyprland.
 
 This skill is for end-user customization on installed systems.

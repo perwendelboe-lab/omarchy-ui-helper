@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # hypr-hands uninstaller.
-#   ./uninstall.sh              remove the installed plugin copy + hypr-hands caches
+#   ./uninstall.sh              remove ~/.local/share/hypr-hands, the hypr-hands CLI and caches
 #   --ydotool                   also undo the ydotool setup (udev rule, input group, user unit)
 #   --cua                       also stop/disable the cua-driver user unit and remove Cua Driver
 #   --packages                  print pacman/yay removal commands (never run automatically)
@@ -11,12 +11,11 @@ for a in "$@"; do case $a in --dry-run) DRY=1;; --yes|-y) YES=1;; --ydotool) YDO
   -h|--help) sed -n 3,9p "$0"; exit 0;; *) echo "unknown flag $a" >&2; exit 2;; esac; done
 run(){ printf '  $ %s\n' "$*"; ((DRY)) || bash -c "$*"; }
 ask(){ ((YES)) && return 0; local r; read -rp "  $1 [y/N] " r; [[ ${r,,} == y* ]]; }
-ROOT=$(cd "$(dirname "$0")" && pwd); dest=$HOME/.cursor/plugins/local/hypr-hands
-echo "== Plugin link"
-if [[ -L $dest ]]; then run "rm '$dest'"
-elif [[ -f $dest/.hypr-hands-installed ]]; then run "rm -rf '$dest'"
-elif [[ -e $dest ]]; then echo "  $dest not created by install.sh; leaving it"
-else echo "  nothing at $dest"; fi
+ROOT=$(cd "$(dirname "$0")" && pwd); HH=$HOME/.local/share/hypr-hands; BIN=$HOME/.local/bin/hypr-hands
+echo "== hypr-hands files"
+[[ -L $BIN ]] && run "rm '$BIN'" || echo "  no CLI symlink at $BIN"
+if [[ -d $HH && $ROOT != "$HH" ]]; then run "rm -rf '$HH'"; elif [[ $ROOT == "$HH" ]]; then echo "  running from $HH; delete it yourself afterwards"; else echo "  nothing at $HH"; fi
+old=$HOME/.cursor/plugins/local/hypr-hands; [[ -L $old || -f $old/.hypr-hands-installed ]] && run "rm -rf '$old'"   # pre-0.3 location
 run "rm -rf '${XDG_CACHE_HOME:-$HOME/.cache}/hypr-hands' '${XDG_RUNTIME_DIR:-/tmp}/hypr-hands'"
 if ((YDO)) && ask "Undo ydotool setup (needs sudo)?"; then
   echo "== ydotool"

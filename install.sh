@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# hypr-hands guided installer.
+# Omarchy UI Helper (hypr-hands) guided installer.
 #   ./install.sh                interactive (asks before each step)
 #   ./install.sh --yes          accept defaults without asking (optional steps stay OFF
 #                               unless --with-cua / --with-ydotool are given)
 #   ./install.sh --non-interactive   same as --yes
 #   ./install.sh --dry-run      print every command, change nothing
-#   --with-cua  --with-ydotool  --no-packages  --no-copy (skip copying into ~/.cursor/plugins/local)
+#   --with-cua  --with-ydotool  --no-packages  --no-copy (skip installing to ~/.local/share/hypr-hands)
 ROOT=$(cd "$(dirname "$0")" && pwd)
 DRY=0 YES=0 WITH_CUA=0 WITH_YDO=0 PKGS=1 LINK=1
 for a in "$@"; do case $a in
   --dry-run) DRY=1;; --yes|-y|--non-interactive) YES=1;; --with-cua) WITH_CUA=1;; --with-ydotool) WITH_YDO=1;;
-  --no-packages) PKGS=0;; --no-link|--no-copy) LINK=0;; -h|--help) sed -n 3,10p "$0"; exit 0;; *) echo "unknown flag $a" >&2; exit 2;; esac; done
+  --no-packages) PKGS=0;; --no-copy) LINK=0;; -h|--help) sed -n 3,10p "$0"; exit 0;; *) echo "unknown flag $a" >&2; exit 2;; esac; done
 b(){ printf '\n\033[1m== %s\033[0m\n' "$*"; }
 run(){ printf '  $ %s\n' "$*"; ((DRY)) || bash -c "$*"; }
 ask(){ # ask "question" default(y|n)
@@ -98,24 +98,19 @@ elif ((WITH_YDO)) || { ((!YES)) && ask "Set up ydotool now?" n; }; then
   echo "  -> Log out and back in, then: systemctl --user start ydotool.service"
 else echo "  skipped (recommended unless you need drag)"; fi
 
-b "6/7 Install plugin into Cursor (~/.cursor/plugins/local/hypr-hands)"
-# Cursor skips symlinks in ~/.cursor/plugins/local that point outside that folder,
-# so the plugin is COPIED (re-run ./install.sh after pulling updates).
-dest=$HOME/.cursor/plugins/local/hypr-hands
+b "6/7 Install hypr-hands to ~/.local/share/hypr-hands + CLI ~/.local/bin/hypr-hands"
+HH=$HOME/.local/share/hypr-hands; BIN=$HOME/.local/bin/hypr-hands
+src="$(command git -C "$ROOT" remote get-url origin 2>/dev/null || echo local) $(command git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || echo '?') from $ROOT"
 if ((LINK)); then
-  if [[ $(readlink -f "$dest" 2>/dev/null) == "$ROOT" && ! -L $dest ]]; then echo "  this checkout IS the plugin dir; nothing to copy"
-  else
-    replaced=0; [[ -L $dest ]] && { echo "  replacing old symlink (Cursor ignores out-of-folder symlinks)"; run "rm '$dest'"; replaced=1; }
-    [[ $replaced == 0 && -e $dest && ! -f $dest/.hypr-hands-installed ]] && { echo "  $dest exists and was not created by this installer; leaving it alone"; LINK=0; }
-    if ((LINK)) && ask "Copy plugin to $dest?" y; then
-      if command -v rsync >/dev/null; then run "mkdir -p '$dest' && rsync -a --delete --exclude .git '$ROOT/' '$dest/' && touch '$dest/.hypr-hands-installed'"
-      else run "rm -rf '$dest' && mkdir -p '$dest' && cp -a '$ROOT/.' '$dest/' && rm -rf '$dest/.git' && touch '$dest/.hypr-hands-installed'"; fi
-    fi
-  fi
+  if [[ $ROOT == "$HH" ]]; then echo "  running from the install dir; nothing to copy"
+  else run "mkdir -p '$HH' && rsync -a --delete --exclude .git '$ROOT/' '$HH/' && echo '$src' > '$HH/.source'"; fi
+  if [[ -e $BIN && ! -L $BIN ]]; then echo "  $BIN exists and is not our symlink; leaving it"
+  else run "mkdir -p '$HOME/.local/bin' && ln -sfn '$HH/bin/hypr-hands' '$BIN'"; fi
+  case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) echo "  NOTE: add ~/.local/bin to PATH (or call $BIN directly)";; esac
 fi
 chmod +x "$ROOT"/scripts/*.sh "$ROOT"/*.sh 2>/dev/null || true
 
 b "7/7 Check"
 if ((DRY)); then echo "  (dry run) would run: $ROOT/scripts/check.sh"; fi
 "$ROOT/scripts/check.sh" | jq -c '{session,lua_repl,locked,click_backend,uinput_writable,cua:.cua_driver.service,missing:[.tools|to_entries[]|select(.value==null)|.key]}'
-echo; echo "Done. Restart Cursor to pick up the plugin. See README.md for the Grok Bot setup."
+echo; echo "Done. Try: hypr-hands check   (scripts: ~/.local/share/hypr-hands/scripts)"

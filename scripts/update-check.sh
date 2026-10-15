@@ -61,13 +61,16 @@ for p in wlrctl ydotool; do
   st=$(cmp "$(semver "$pi")" "$(semver "${pl#* }")"); [[ -n $pi && $pi == "${pl#* }" ]] && st=up-to-date
   add "$p" "$pi" "${pl#* }" "$st" false "${pl%% *}" "$( [[ ${pl%% *} == aur ]] && echo "yay -S aur/$p" || echo "sudo pacman -S $p")"
 done
-# hypr-hands
-hv=$(jq -r .version "$ROOT/plugin.json"); hh=$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)
-dirty=$(git -C "$ROOT" status --porcelain 2>/dev/null | wc -l); remote=$(git -C "$ROOT" remote get-url origin 2>/dev/null || true)
-hl2=""; hst=no-remote
-if [[ -n $remote ]]; then hl2=$(git ls-remote "$remote" HEAD 2>/dev/null | cut -c1-7); [[ ${hl2:0:7} == "${hh:0:7}" ]] && hst=up-to-date || hst=update-available; fi
-add hypr-hands "$hv@$hh" "$hl2" "$hst" false "${remote:-local}" "uncommitted files: $dirty"
-
+# hypr-hands: installed copy (~/.local/share/hypr-hands/.source) or git clone, vs GitHub main
+UPSTREAM=${HYPR_HANDS_REPO:-https://github.com/perwendelboe-lab/omarchy-ui-helper}
+hv=$(jq -r .version "$ROOT/plugin.json"); clone=""
+for c in "$ROOT" "$HOME/code/omarchy-ui-helper" "$HOME/code/hypr-hands"; do [[ -d $c/.git ]] && { clone=$c; break; }; done
+if [[ -n $clone ]]; then hh=$(command git -C "$clone" rev-parse --short HEAD); where="clone $clone"
+else hh=$(awk '{print $2}' "$ROOT/.source" 2>/dev/null || true); where="install $ROOT"; fi
+uh=$(command git ls-remote "$UPSTREAM" refs/heads/main 2>/dev/null | cut -c1-7)
+uv=$(curl -fsSL "${UPSTREAM/github.com/raw.githubusercontent.com}/main/plugin.json" 2>/dev/null | jq -r '.version // empty' || true)
+if [[ -z $uh ]]; then hst=unknown; elif [[ ${hh:0:7} == "$uh" ]]; then hst=up-to-date; else hst=update-available; fi
+add hypr-hands "$hv@${hh:-?}" "${uv:-?}@${uh:-?}" "$hst" "$(major "$hv" "${uv:-$hv}")" "$UPSTREAM" "checked via $where; update: git -C ~/code/omarchy-ui-helper pull && ~/code/omarchy-ui-helper/install.sh --yes --no-packages"
 out=$(printf '%s\n' "${items[@]}" | jq -sc '{checked_at:(now|todate),items:.,updates:[.[]|select(.status=="update-available")|.name],major_bumps:[.[]|select(.major_bump)|.name]}')
 if ((json_only)); then echo "$out"; else
   echo "$out" | jq .

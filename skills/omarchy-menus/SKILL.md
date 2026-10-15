@@ -1,13 +1,13 @@
 ---
 name: omarchy-menus
-description: Drive Omarchy menus and launchers (walker-based) by keyboard, e.g. look up keybindings or run Omarchy actions.
+description: Drive Omarchy menus (keybindings menu, main menu) by keyboard on the user's Omarchy computer, e.g. to trigger an action by name.
 ---
-# Omarchy menus
-Omarchy menus are keyboard-filtered lists — no pointer needed.
-- Keybindings: run `omarchy-menu-keybindings` (or Super+K via `scripts/key.sh super+k`), then `scripts/type.sh "filter text"`, then `scripts/key.sh Return`.
-- Main menu: `omarchy-menu` (Super+Alt+Space), same filter-then-Return pattern.
-- Close with `scripts/key.sh Escape`.
-Verify with `describe.sh` / `shot.sh` that the menu opened before typing. Don't edit `/usr/share/omarchy`.
+# Omarchy menus (remote)
+Run via Shell with the user's Omarchy `machineId`. Menus are keyboard-filtered lists — no pointer needed.
 
-
-Tested: launched `omarchy-menu-keybindings` (layer namespace `omarchy-menu`, check with `hyprctl layers -j`), `type.sh 'Full screen'`, `key.sh Return` → focused window went fullscreen. The menu layer takes keyboard focus while `activewindow` still reports the underlying window.
+1. Focus the intended target window first (menu actions apply to it), and set `HYPR_HANDS_REQUIRE_CLASS` to its class.
+2. Open: `setsid omarchy-menu-keybindings >/dev/null 2>&1 &` (or `omarchy-menu` for the main menu).
+3. Confirm the layer is up: `hyprctl layers -j | jq '[.[].levels[][]|.namespace]'` contains `omarchy-menu`. The menu takes keyboard focus while `activewindow` still reports the underlying window.
+4. `hypr-hands type 'Full screen'`, check with `hypr-hands shot` / `ocr-find`, then `hypr-hands key Return`.
+5. Verify the effect (e.g. `hyprctl clients -j` fullscreen). Cancel with `hypr-hands key Escape` only while the menu layer is present.
+Never edit `/usr/share/omarchy`.

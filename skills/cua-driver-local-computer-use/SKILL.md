@@ -1,13 +1,14 @@
 ---
 name: cua-driver-local-computer-use
 description: >-
-  Use when driving a real GUI on the user's local computer (especially
-  Omarchy/Hyprland Linux) via cua-driver CLI — computer-use tasks, native apps,
-  window automation — instead of the box desktop.
+  Use when driving a real GUI on the user's own computer (especially
+  Omarchy/Hyprland Linux) via the cua-driver CLI over Shell with their
+  machineId - computer-use tasks, native apps, window automation - instead of
+  the box desktop.
 ---
 # Cua Driver local computer use
 
-Drive real GUI apps on the **user's own computer** (for remote agents such as Grok Bot: the registered machine) with the `cua-driver` CLI. Prefer this over the box `computerUse` subagent whenever the task is on their desktop (Omarchy, Hyprland, local apps, signed-in sessions).
+Drive real GUI apps on the **user's registered computer** with the `cua-driver` CLI. Prefer this over the box `computerUse` subagent whenever the task is on their desktop (Omarchy, Hyprland, local apps, signed-in sessions).
 
 Upstream pack (read on demand from the machine being driven):
 `~/.cua-driver/skills/cua-driver/` — start with `SKILL.md`, then `WORKFLOW.md`, `RUNTIME.md`, and the host guide (`LINUX.md` on Linux).
@@ -22,8 +23,8 @@ Do **not** use for pure filesystem/CLI outcomes the agent can do with Shell/Read
 
 ## Machine and transport
 
-1. Resolve the target computer. Remote agents (e.g. Grok Bot): use `ListMachines` and prefer the machine the message came from or the one the user named; local agents (Cursor on the same machine): just run the commands.
-2. Run every `cua-driver` command **on that computer** (remote agents: Shell with `machineId=<your-machine-id>`). Never run host GUI control on the box unless the user explicitly wants the box desktop driven.
+1. Resolve the target with `ListMachines`. Prefer the machine the message came from, or the one the user named (e.g. their Omarchy computer).
+2. Run every `cua-driver` command with Shell **`machineId` set to that computer**. Never run host GUI control on the box unless the user explicitly wants the box desktop driven.
 3. Ensure `PATH` includes `~/.local/bin`. On Wayland/Hyprland/Omarchy, the daemon should already run with `CUA_DRIVER_RS_ENABLE_WAYLAND=1` (systemd user unit `cua-driver.service` if configured).
 4. Preflight once per session of work:
 
@@ -35,7 +36,7 @@ cua-driver doctor
 
 If the daemon is down: `systemctl --user start cua-driver.service` (or `cua-driver serve --socket ~/.cache/cua-driver/cua-driver.sock` with Wayland enabled). Do not `cua-driver stop` a shared service when finishing a task — use `end_session` for the run label only.
 
-Remote shell agents (Grok Bot) do not use stdio MCP for Cua; local agents may use `cua-driver mcp`, but the CLI works everywhere. Use `cua-driver call <tool> '<json>'` (or the short form `cua-driver <tool> '<json>'` when advertised).
+Grok Bot does not use stdio MCP for Cua. Use the CLI: Use `cua-driver call <tool> '<json>'` (or the short form `cua-driver <tool> '<json>'` when advertised).
 
 ## Observe → act → verify
 
@@ -75,7 +76,7 @@ cua-driver call end_session '{"session":"run-1"}'
 
 ## Pointer/keyboard fallback: hypr-hands (Hyprland/Omarchy)
 
-When AT-SPI tokens are unavailable or `background_unavailable` persists, and the user has approved foreground input, fall back to the hypr-hands scripts in this plugin (`<plugin-root>/scripts/`, e.g. `~/.cursor/plugins/local/hypr-hands/scripts/`): `geom.sh`/`ocr-find.sh` to locate, `move.sh` (verified), `click.sh`, `scroll.sh`, `type.sh`, `key.sh`, `drag.sh` (ydotool opt-in). Set `HYPR_HANDS_REQUIRE_CLASS=<target class prefix>` so input is refused unless the target window is focused and under the cursor. Always `end_session` your cua run label first.
+When AT-SPI tokens are unavailable or `background_unavailable` persists, and the user has approved foreground input, fall back to hypr-hands (`hypr-hands <cmd>` or `~/.local/share/hypr-hands/scripts/<cmd>.sh`, same machineId): `geom`/`ocr-find` to locate, `move` (verified), `click`, `scroll`, `type`, `key`, `drag` (ydotool opt-in). Set `HYPR_HANDS_REQUIRE_CLASS=<target class prefix>` so input is refused unless the target window is focused and under the cursor. Always `end_session` your cua run label first.
 
 ### Omarchy/Hyprland Lua dispatch (Hyprland with Lua config)
 

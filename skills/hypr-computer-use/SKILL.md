@@ -1,28 +1,27 @@
 ---
 name: hypr-computer-use
-description: Operate the user's Omarchy/Hyprland (Wayland) desktop - observe, click, type, manage windows. Use when asked to do something in a GUI app on Linux/Hyprland.
+description: Operate the user's Omarchy/Hyprland (Wayland) desktop remotely - observe, click, type, scroll, manage windows. Use when asked to do something in a GUI app on their Omarchy computer.
 ---
-# Hyprland computer use
+# Omarchy computer use (remote)
 
-Scripts live in `scripts/` at the plugin root (installed copy: `~/.cursor/plugins/local/hypr-hands/scripts`). Before any input set `HYPR_HANDS_REQUIRE_CLASS=<target window class prefix>` so scripts refuse (exit 8) if focus or the window under the cursor is wrong. All emit JSON or plain paths; nonzero exit = refused/failed.
+You drive the user's Omarchy computer from Grok Bot. **Every command runs through your Shell tool with `machineId` = the user's Omarchy machine** (find it with `ListMachines`; prefer the machine the message came from or the one they name). Never run these on your own box.
 
-## Order of backends
-1. **cua-driver first** (`~/.local/bin/cua-driver`, MCP or `cua-driver call ...`): accessibility tree actions don't steal the pointer. Always finish with `end_session`.
-2. **Pointer fallback**: `move.sh` (Lua `hl.dsp.cursor.move`) + `click.sh` (wlrctl → hypruse → ydotool only if `HYPR_HANDS_ALLOW_UINPUT=1`).
-3. Keyboard: `type.sh`, `key.sh` (wtype).
+Tools: `hypr-hands <cmd> [args]` (CLI in `~/.local/bin`) = `~/.local/share/hypr-hands/scripts/<cmd>.sh`. All print JSON; nonzero exit = refused/failed. If missing, install: `git clone https://github.com/perwendelboe-lab/omarchy-ui-helper ~/code/omarchy-ui-helper && ~/code/omarchy-ui-helper/install.sh --yes --no-packages` (ask first; packages need the user's sudo).
+
+## Backend order
+1. **Cua Driver first** (skill `cua-driver-local-computer-use`): accessibility actions, no pointer takeover. End with `end_session`.
+2. **Pointer/keyboard fallback**: `hypr-hands move|click|scroll|drag|type|key` (wlrctl; ydotool only with `HYPR_HANDS_ALLOW_UINPUT=1`).
 
 ## Loop: observe → act → verify
-1. `check.sh` once; `describe.sh` / `geom.sh` to observe; `shot.sh` + `ocr-find.sh TEXT` to locate.
-2. Act with one small step.
-3. Verify (new `describe.sh`, screenshot, `wait-window.sh`). Never chain blind actions.
+1. `hypr-hands check` once; `hypr-hands describe` / `geom` to observe; `shot` + `ocr-find TEXT` to locate (read screenshots with Read + machineId).
+2. One small action at a time.
+3. Verify (`describe`, new screenshot, `wait-window CLASS`). Never chain blind actions.
 
 ## Safety rules
-- Ask the user before taking over the foreground pointer/keyboard.
-- Never act while the screen is locked (scripts refuse if `hyprlock` runs).
-- Verify cursorpos before every click (`click.sh btn X Y` does it, ±2px).
-- Never type secrets; `type.sh` refuses secret-looking text.
-- ydotool/uinput is opt-in only; never change system permissions or install packages yourself — print `setup.sh` output.
-- Don't close or move windows you didn't open.
-
-
-Keyboard tested: `type.sh` text and `key.sh` chords (Return, ctrl+u, ctrl+shift+a).
+- Ask before taking over the user's pointer/keyboard (they may be using the machine).
+- Set `HYPR_HANDS_REQUIRE_CLASS=<target class prefix>` on every input command: scripts refuse (exit 8) unless the focused window — and for pointer actions the window under the cursor — matches.
+- Never act on a locked screen (scripts refuse while `hyprlock` runs).
+- Verify cursor position before clicks (`click left X Y` does it, ±2px).
+- Never type secrets (`type` refuses secret-looking text).
+- ydotool/uinput is opt-in. Never run sudo/pacman/yay yourself (no TTY; they hang) — give the user the command.
+- Don't close or move windows you didn't open; record and restore the cursor position.

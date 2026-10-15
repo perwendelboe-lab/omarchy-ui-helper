@@ -35,13 +35,13 @@ hi=$(semver "$(hyprctl version 2>/dev/null | grep -m1 -oE 'Tag: v[0-9.]+' || tru
 releases_since hyprland hyprwm/Hyprland v "$hi"
 # Omarchy publishes tags, not GitHub releases: scan commit subjects since the installed version.
 oraw=$(omarchy version 2>/dev/null || true); oi=$(semver "$oraw"); repo="$CACHE/omarchy.git"
-if [[ -d $repo ]]; then git -C "$repo" fetch -q --tags origin 2>/dev/null || true
+if [[ -d $repo ]]; then command git -C "$repo" fetch -q --tags origin 2>/dev/null || true
 else git clone -q --bare --filter=blob:none https://github.com/basecamp/omarchy "$repo" 2>/dev/null || true; fi
-from=""; [[ $oraw =~ \.g([0-9a-f]{7,}) ]] && git -C "$repo" cat-file -e "${BASH_REMATCH[1]}" 2>/dev/null && from=${BASH_REMATCH[1]}
-[[ -z $from && -n $oi ]] && git -C "$repo" rev-parse -q --verify "v$oi" >/dev/null && from="v$oi"
-latest=$(git -C "$repo" tag -l 'v*' 2>/dev/null | sort -V | tail -1)
-range="${from:+$from..}origin/HEAD"; git -C "$repo" rev-parse -q --verify origin/HEAD >/dev/null 2>&1 || range="${from:+$from..}HEAD"
-log=$(git -C "$repo" log --format='%h %s' "$range" 2>/dev/null | head -400 || true)
+from=""; [[ $oraw =~ \.g([0-9a-f]{7,}) ]] && command git -C "$repo" cat-file -e "${BASH_REMATCH[1]}" 2>/dev/null && from=${BASH_REMATCH[1]}
+[[ -z $from && -n $oi ]] && command git -C "$repo" rev-parse -q --verify "v$oi" >/dev/null && from="v$oi"
+latest=$(command git -C "$repo" tag -l 'v*' 2>/dev/null | sort -V | tail -1)
+range="${from:+$from..}origin/HEAD"; command git -C "$repo" rev-parse -q --verify origin/HEAD >/dev/null 2>&1 || range="${from:+$from..}HEAD"
+log=$(command git -C "$repo" log --format='%h %s' "$range" 2>/dev/null | head -400 || true)
 ncommits=$(grep -c . <<<"$log" || true)
 hits=$(grep -iE "$KW" <<<"$log" | cut -c1-200 | head -40 || true)
 results+=("$(jq -nc --arg i "$oraw" --arg f "$from" --arg l "$latest" --argjson n "${ncommits:-0}" --arg h "$hits" \

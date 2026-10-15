@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# hypr-hands CLI: `hypr-hands <command> [args]` runs ~/.local/share/hypr-hands/scripts/<command>.sh
+set -euo pipefail
+HH_HOME=${HYPR_HANDS_HOME:-$HOME/.local/share/hypr-hands}
+S=$HH_HOME/scripts
+case ${1:-help} in
+  help|-h|--help)
+    echo "usage: hypr-hands <command> [args]   (scripts in $S)"
+    echo "commands: $(cd "$S" && ls -1 ./*.sh | sed 's|./||;s|\.sh$||' | grep -vx lib | tr '\n' ' ')"
+    echo "          version   path"; exit 0 ;;
+  version) jq -r '"hypr-hands \(.version)"' "$HH_HOME/plugin.json"; cat "$HH_HOME/.source" 2>/dev/null || true; exit 0 ;;
+  path) echo "$HH_HOME"; exit 0 ;;
+esac
+cmd=$1; shift
+[[ $cmd =~ ^[a-z-]+$ && $cmd != lib && -x $S/$cmd.sh ]] || { echo "hypr-hands: unknown command '$cmd' (try: hypr-hands help)" >&2; exit 2; }
+exec "$S/$cmd.sh" "$@"
