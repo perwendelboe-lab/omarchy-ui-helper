@@ -130,6 +130,10 @@ Omarchy 4.0.0 (dev), Hyprland 0.56.2 (Lua config), eDP-1 1920×1080 @1.5, wlrctl
 | install.sh (dry-run + real `--yes --no-packages`), update-check, breaking-watch | ✅ · fresh-machine install with packages ⚠️ untested |
 | hypruse backend | ⚠️ untested |
 
+## Privacy
+
+Runtime output stays out of the repo: screenshots/OCR in `$XDG_RUNTIME_DIR/hypr-hands`, caches in `$XDG_CACHE_HOME/hypr-hands`. Before committing, run `scripts/privacy-check.sh` (staged files) or `--all`, or install it as a hook: `ln -sf ../../scripts/privacy-check.sh .git/hooks/pre-commit`. Put personal patterns (your email, hostname, machine IDs) in `~/.config/hypr-hands/privacy-patterns`, not in the repo.
+
 ## License
 
 MIT © 2026 PWN. The bundled `omarchy` skill is adapted from Omarchy (MIT). Cua Driver is a separate project by trycua under its own license.

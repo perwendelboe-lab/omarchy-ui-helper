@@ -1,0 +1,32 @@
+# Secrets / local config
+.env
+.env.*
+*.local
+*.pem
+*.key
+
+# Runtime output (scripts write to $XDG_RUNTIME_DIR/hypr-hands and $XDG_CACHE_HOME/hypr-hands; never commit captures)
+*.log
+*.png
+!assets/logo.png
+screenshots/
+shots/
+ocr/
+*.ocr.txt
+*.tsv
+tmp/
+temp/
+cache/
+.cache/
+state/
+.state/
+.source
+
+# OS / editors
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.idea/
+.vscode/

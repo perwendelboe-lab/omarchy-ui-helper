@@ -2,6 +2,11 @@
 
 All notable changes to hypr-hands. Versions follow SemVer.
 
+## 0.3.2 — 2026-10-15
+### Added
+- `.gitignore` for secrets (`.env*`, keys), logs, screenshots/OCR/runtime output, state/cache dirs, OS and editor files.
+- `scripts/privacy-check.sh`: pre-commit grep for emails, home paths, MAC/IP addresses, UUIDs, tokens and private keys (extra local patterns from `~/.config/hypr-hands/privacy-patterns`).
+
 ## 0.3.1 — 2026-10-15
 ### Added
 - Dispatch backend detection in `lib.sh`: Lua (`hyprctl repl` + `hl.dsp.*`, Omarchy 4.x stable/edge) or classic `hyprctl dispatch` (hyprland.conf setups). Override with `HYPR_HANDS_DISPATCH`, preview with `HYPR_HANDS_DRYRUN=1`. Used by move/drag/windows; `check` reports `dispatch`.
