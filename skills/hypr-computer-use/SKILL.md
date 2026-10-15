@@ -4,7 +4,7 @@ description: Operate the user's Omarchy/Hyprland (Wayland) desktop - observe, cl
 ---
 # Hyprland computer use
 
-Scripts live in `scripts/` at the plugin root (e.g. `~/.cursor/plugins/local/hypr-hands/scripts`). All emit JSON or plain paths; nonzero exit = refused/failed.
+Scripts live in `scripts/` at the plugin root (installed copy: `~/.cursor/plugins/local/hypr-hands/scripts`). Before any input set `HYPR_HANDS_REQUIRE_CLASS=<target window class prefix>` so scripts refuse (exit 8) if focus or the window under the cursor is wrong. All emit JSON or plain paths; nonzero exit = refused/failed.
 
 ## Order of backends
 1. **cua-driver first** (`~/.local/bin/cua-driver`, MCP or `cua-driver call ...`): accessibility tree actions don't steal the pointer. Always finish with `end_session`.

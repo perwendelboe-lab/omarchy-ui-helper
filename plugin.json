@@ -1,9 +1,9 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "hypr-hands",
-  "version": "0.1.0",
-  "description": "Computer use for Omarchy/Hyprland (Wayland): observe, point, click, type, read the screen and manage windows via hyprctl Lua dispatch, wtype, grim and tesseract.",
+  "version": "0.2.0",
+  "description": "Computer use for Omarchy/Hyprland (Wayland): observe, point, click, scroll, drag, type, read the screen and manage windows with hyprctl Lua dispatch, wlrctl, wtype, grim and tesseract, plus Cua Driver and Omarchy skills.",
   "author": { "name": "PWN" },
   "license": "MIT",
-  "keywords": ["hyprland", "omarchy", "wayland", "computer-use", "automation", "linux"]
+  "keywords": ["hyprland", "omarchy", "wayland", "computer-use", "automation", "linux", "cua-driver", "arch"]
 }
