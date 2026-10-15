@@ -100,7 +100,7 @@ Update: `cua-driver update --apply && systemctl --user restart cua-driver.servic
 | sudo/pacman hangs when the bot runs it | No TTY for the password; run that command yourself. |
 | HiDPI coordinates off | Scripts use logical px; screenshots are physical; see `hypr-hands geom`. |
 
-## Tested matrix (v0.3.0)
+## Tested matrix (v0.3.1)
 
 Omarchy 4.0.0 (dev), Hyprland 0.56.2 (Lua config), eDP-1 1920×1080 @1.5, wlrctl 0.2.2, ydotool 1.0.4, cua-driver 0.30.1, driven remotely by Grok Bot.
 

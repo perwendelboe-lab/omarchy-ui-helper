@@ -16,4 +16,4 @@ for ((i=1;i<=n;i++)); do cursor_move $((x1+(x2-x1)*i/n)) $((y1+(y2-y1)*i/n)); sl
 "$d/move.sh" "$x2" "$y2" >/dev/null || die "cursor verify failed at end" 4
 guard_target
 sleep 0.05; trap - EXIT; ydo click 0x80
-jq -nc --argjson a "[$x1,$y1]" --argjson b "[$x2,$y2]" '{ok:true,backend:"ydotool+lua",from:$a,to:$b}'
+jq -nc --arg m "$(dispatch_mode)" --argjson a "[$x1,$y1]" --argjson b "[$x2,$y2]" '{ok:true,backend:("ydotool+"+$m),from:$a,to:$b}'
