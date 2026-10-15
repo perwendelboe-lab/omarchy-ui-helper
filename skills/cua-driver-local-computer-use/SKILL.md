@@ -36,7 +36,7 @@ cua-driver doctor
 
 If the daemon is down: `systemctl --user start cua-driver.service` (or `cua-driver serve --socket ~/.cache/cua-driver/cua-driver.sock` with Wayland enabled). Do not `cua-driver stop` a shared service when finishing a task — use `end_session` for the run label only.
 
-Grok Bot does not use stdio MCP for Cua. Use the CLI: Use `cua-driver call <tool> '<json>'` (or the short form `cua-driver <tool> '<json>'` when advertised).
+Grok Bot does not use stdio MCP for Cua. Use the CLI: `cua-driver call <tool> '<json>'` (or the short form `cua-driver <tool> '<json>'` when advertised).
 
 ## Observe → act → verify
 
