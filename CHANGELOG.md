@@ -2,6 +2,12 @@
 
 All notable changes to hypr-hands. Versions follow SemVer.
 
+## 0.3.1 — 2026-10-15
+### Added
+- Dispatch backend detection in `lib.sh`: Lua (`hyprctl repl` + `hl.dsp.*`, Omarchy 4.x stable/edge) or classic `hyprctl dispatch` (hyprland.conf setups). Override with `HYPR_HANDS_DISPATCH`, preview with `HYPR_HANDS_DRYRUN=1`. Used by move/drag/windows; `check` reports `dispatch`.
+- Clear JSON error (exit 9) when a dispatch fails.
+- Compatibility notes for Omarchy stable vs edge in README and skills.
+
 ## 0.3.0 — 2026-10-15
 ### Changed
 - Retargeted to **Grok Bot only** (project name: Omarchy UI Helper). Skills rewritten for a bot that drives the user's Omarchy computer remotely (Shell + machineId).

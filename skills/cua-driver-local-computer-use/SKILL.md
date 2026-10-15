@@ -78,7 +78,7 @@ cua-driver call end_session '{"session":"run-1"}'
 
 When AT-SPI tokens are unavailable or `background_unavailable` persists, and the user has approved foreground input, fall back to hypr-hands (`hypr-hands <cmd>` or `~/.local/share/hypr-hands/scripts/<cmd>.sh`, same machineId): `geom`/`ocr-find` to locate, `move` (verified), `click`, `scroll`, `type`, `key`, `drag` (ydotool opt-in). Set `HYPR_HANDS_REQUIRE_CLASS=<target class prefix>` so input is refused unless the target window is focused and under the cursor. Always `end_session` your cua run label first.
 
-### Omarchy/Hyprland Lua dispatch (Hyprland with Lua config)
+### Hyprland dispatch: Lua config (Omarchy 4.x) vs classic
 
 Classic `hyprctl dispatch <name> args` is rewritten to `hl.dispatch(...)` and fails for most dispatchers, e.g. `hyprctl dispatch movecursor X Y` → Lua syntax error. Use `hyprctl repl` with `hl.dsp.*`:
 
@@ -89,4 +89,6 @@ hyprctl repl "hl.dispatch(hl.dsp.window.move({ workspace = '3', follow = false }
 hyprctl repl "hl.dispatch(hl.dsp.window.fullscreen()); return 'ok'"
 hyprctl repl "hl.dispatch(hl.dsp.window.close()); return 'ok'"
 ```
+Classic equivalents for Hyprland with `hyprland.conf` (Omarchy 3.x, plain Hyprland): `hyprctl dispatch movecursor X Y`, `focuswindow address:0x…`, `movetoworkspacesilent N`, `fullscreen 0`, `killactive`. Omarchy 4.x (stable and edge) uses the Lua form. hypr-hands detects this automatically.
+
 Read-only `hyprctl cursorpos`, `activewindow -j`, `clients -j`, `monitors -j`, `layers -j` work normally. Introspect: `hyprctl repl "local t={} for k in pairs(hl.dsp) do t[#t+1]=k end return table.concat(t,' ')"`. Avoid `hl.dsp.send_shortcut` unless the target window is verified focused — it injects real keys.

@@ -33,6 +33,17 @@ git clone https://github.com/perwendelboe-lab/omarchy-ui-helper ~/code/omarchy-u
 `install.sh` flags: `--dry-run`, `--yes`/`--non-interactive`, `--with-cua`, `--with-ydotool`, `--no-packages`, `--no-copy`. Steps: detect Omarchy/Hyprland/Wayland → pacman packages (`grim slurp wl-clipboard tesseract tesseract-data-eng jq wtype`) → `yay -S aur/wlrctl` → optional Cua Driver → optional ydotool → copy to `~/.local/share/hypr-hands` + `hypr-hands` CLI → `hypr-hands check`.
 Update: `git -C ~/code/omarchy-ui-helper pull && ~/code/omarchy-ui-helper/install.sh --yes --no-packages`. Remove: `./uninstall.sh` (`--ydotool`, `--cua`, `--packages`, `--dry-run`).
 
+## Compatibility (Omarchy channels)
+
+| | Edge / dev (tested) | Stable 4.0.x | Omarchy 3.x / plain Hyprland `.conf` |
+|---|---|---|---|
+| Hyprland | 0.56.2 (Lua config) | 0.56.2 (Lua config) | classic hyprlang |
+| Dispatch used | `hyprctl repl` + `hl.dsp.*` | same | `hyprctl dispatch …` (auto-detected; untested live) |
+| `omarchy-menu-keybindings`, `omarchy` CLI, `omarchy-menu` layer, `/usr/share/omarchy/default/agents/skills/omarchy` | ✅ | ✅ | menus differ; not covered |
+| Packages (grim, wtype, tesseract, ydotool from Arch/Omarchy mirrors; wlrctl from AUR) | ✅ | ✅ | ✅ |
+
+Force a style with `HYPR_HANDS_DISPATCH=lua|classic`; `HYPR_HANDS_DRYRUN=1` prints dispatch commands instead of running them.
+
 ## Cua Driver (recommended)
 
 Install (official, no sudo, to `~/.local/bin/cua-driver`):
@@ -98,6 +109,7 @@ Update: `cua-driver update --apply && systemctl --user restart cua-driver.servic
 | `hypr-hands: command not found` | Add `~/.local/bin` to PATH or call `~/.local/share/hypr-hands/bin/hypr-hands`. |
 | `click` exit 5 "no click backend" | Install wlrctl or opt in to ydotool. |
 | sudo/pacman hangs when the bot runs it | No TTY for the password; run that command yourself. |
+| `dispatch failed` (exit 9) | Wrong dispatch style forced or detected; unset `HYPR_HANDS_DISPATCH` and check `hypr-hands check` → `dispatch`. |
 | HiDPI coordinates off | Scripts use logical px; screenshots are physical; see `hypr-hands geom`. |
 
 ## Tested matrix (v0.3.1)

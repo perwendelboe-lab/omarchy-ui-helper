@@ -8,6 +8,9 @@ You drive the user's Omarchy computer from Grok Bot. **Every command runs throug
 
 Tools: `hypr-hands <cmd> [args]` (CLI in `~/.local/bin`) = `~/.local/share/hypr-hands/scripts/<cmd>.sh`. All print JSON; nonzero exit = refused/failed. If missing, install: `git clone https://github.com/perwendelboe-lab/omarchy-ui-helper ~/code/omarchy-ui-helper && ~/code/omarchy-ui-helper/install.sh --yes --no-packages` (ask first; packages need the user's sudo).
 
+## Compatibility
+Omarchy stable (4.0.x) and edge/dev both use Hyprland 0.56 with Lua config (`hyprctl repl` + `hl.dsp.*`). Older Omarchy 3.x / plain Hyprland with `hyprland.conf` uses classic `hyprctl dispatch`; the scripts auto-detect (`hypr-hands check` → `"dispatch":"lua"|"classic"`; force with `HYPR_HANDS_DISPATCH=lua|classic`).
+
 ## Backend order
 1. **Cua Driver first** (skill `cua-driver-local-computer-use`): accessibility actions, no pointer takeover. End with `end_session`.
 2. **Pointer/keyboard fallback**: `hypr-hands move|click|scroll|drag|type|key` (wlrctl; ydotool only with `HYPR_HANDS_ALLOW_UINPUT=1`).
