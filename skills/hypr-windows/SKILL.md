@@ -11,3 +11,6 @@ description: List, focus, move-to-workspace, fullscreen and wait for Hyprland wi
 - `scripts/wait-window.sh CLASS [timeout]` — after launching an app.
 Raw: `hyprctl repl "hl.dispatch(hl.dsp.focus({ window = 'address:0x…' })); return 'ok'"`.
 Ask before rearranging the user's existing windows.
+
+
+Tested: list, focus, move to workspace 9 (follow=false) and back, fullscreen 0→2→0, close. Note: focusing a window on another workspace switches to that workspace.

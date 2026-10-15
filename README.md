@@ -35,3 +35,19 @@ ln -s ~/code/hypr-hands ~/.cursor/plugins/local/hypr-hands
 - End cua-driver sessions with `end_session`.
 
 No `mcp.json` ships: hypruse was not present on the dev machine. If you install it you can add it as an MCP server yourself.
+
+## Guard for automated tests / sandboxes
+Set `HYPR_HANDS_REQUIRE_CLASS=<prefix>` and `click.sh`, `scroll.sh`, `type.sh` and `key.sh` refuse (exit 8) unless the focused window (and, for pointer actions, the window under the cursor) has a class starting with that prefix.
+
+## Tested status (v0.1.0, Omarchy, Hyprland Lua config, eDP-1 1920x1080 @1.5)
+| Feature | Status |
+|---|---|
+| move.sh (Lua `hl.dsp.cursor.move`) + ±2px verify | tested |
+| click.sh left/right/middle via `wlrctl pointer click` | tested (foot mouse log + GTK4 button) |
+| scroll.sh up/down/left/right via `wlrctl pointer scroll <dy> <dx>`, step = 15 units (one libinput notch) | tested |
+| drag.sh | ydotool-only (wlrctl has no press/hold); not tested |
+| type.sh / key.sh (wtype, chords incl. ctrl+shift) | tested |
+| shot.sh full, ocr-find.sh, clip.sh, geom/describe/check | tested |
+| windows.sh list/focus/move/fullscreen/close | tested |
+| omarchy-menus: `omarchy-menu-keybindings` → type filter → Return | tested (toggled fullscreen) |
+| shot.sh region/select/window, hypruse backend | not tested |

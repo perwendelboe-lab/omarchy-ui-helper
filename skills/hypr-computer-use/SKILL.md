@@ -23,3 +23,6 @@ Scripts live in `scripts/` at the plugin root (e.g. `~/.cursor/plugins/local/hyp
 - Never type secrets; `type.sh` refuses secret-looking text.
 - ydotool/uinput is opt-in only; never change system permissions or install packages yourself — print `setup.sh` output.
 - Don't close or move windows you didn't open.
+
+
+Keyboard tested: `type.sh` text and `key.sh` chords (Return, ctrl+u, ctrl+shift+a).

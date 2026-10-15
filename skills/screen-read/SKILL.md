@@ -8,3 +8,6 @@ description: Read the screen on Hyprland - screenshots (grim), OCR text location
 - `scripts/clip.sh get` / `scripts/clip.sh set TEXT` — save and restore the user's clipboard if you change it.
 - `scripts/describe.sh` — text summary of monitors, active window, windows per workspace.
 Screenshots may contain private data; don't upload them anywhere.
+
+
+Tested: shot full, ocr-find (logical coords matched click targets), clip round-trip.

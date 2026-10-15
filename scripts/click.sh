@@ -8,6 +8,7 @@ if have wlrctl; then backend=wlrctl; elif have hypruse; then backend=hypruse
 elif have ydotool && [[ ${HYPR_HANDS_ALLOW_UINPUT:-0} == 1 ]]; then backend=ydotool; fi
 [[ $backend == none ]] && die "no click backend: install wlrctl (yay -S wlrctl) or hypruse, or opt in to ydotool with HYPR_HANDS_ALLOW_UINPUT=1" 5
 if [[ $# -ge 3 ]]; then "$(dirname "$0")/move.sh" "$2" "$3" >/dev/null || die "cursor verify failed before click" 4; fi
+guard_target
 case $backend in
   wlrctl) wlrctl pointer click "$btn" ;;   # man wlrctl: pointer click [left|right|middle]
   hypruse) hypruse click --button "$btn" ;;

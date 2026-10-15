@@ -6,3 +6,17 @@ require_unlocked(){ locked && die "screen is locked (hyprlock running); refusing
 lua(){ hyprctl repl "$1"; }
 cursor(){ hyprctl cursorpos | tr -d ' ' ; }   # "x,y" logical coords
 cursor_move(){ lua "hl.dispatch(hl.dsp.cursor.move({ x = $1, y = $2 })); return 'ok'" >/dev/null; }
+# Optional guard: if HYPR_HANDS_REQUIRE_CLASS is set (prefix), the focused window
+# and the window under the cursor must both have a class starting with it.
+guard_target(){
+  local pre=${HYPR_HANDS_REQUIRE_CLASS:-}; [[ -z $pre ]] && return 0
+  local act c x y under
+  act=$(hyprctl activewindow -j | jq -r '.class // ""')
+  [[ $act == "$pre"* ]] || die "guard: focused window '$act' is not $pre*" 8
+  [[ ${1:-} == nopointer ]] && return 0
+  c=$(cursor); x=${c%,*}; y=${c#*,}
+  under=$(hyprctl clients -j | jq -r --argjson x "$x" --argjson y "$y" --argjson ws "$(hyprctl activeworkspace -j | jq .id)" '
+    [.[]|select(.workspace.id==$ws and .mapped and ($x>=.at[0]) and ($x<.at[0]+.size[0]) and ($y>=.at[1]) and ($y<.at[1]+.size[1]))]
+    | sort_by(.fullscreen|not) | sort_by(.focusHistoryID) | .[0].class // ""')
+  [[ $under == "$pre"* ]] || die "guard: window under cursor '$under' is not $pre*" 8
+}

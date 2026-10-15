@@ -10,3 +10,7 @@ Coordinates are **logical** layout px (what `hyprctl cursorpos` reports). Screen
 - `scripts/scroll.sh up|down [n]` — wlrctl / ydotool; falls back to PageUp/PageDown keys.
 - `scripts/drag.sh X1 Y1 X2 Y2` — needs ydotool opt-in; to move windows use `windows.sh` instead.
 Record the cursor before acting and restore it roughly afterwards.
+
+
+Tested: click left/right/middle (wlrctl), scroll all four directions (15 units = 1 notch; apps may emit several events per notch). Drag untested (ydotool-only).
+Set `HYPR_HANDS_REQUIRE_CLASS=prefix` to hard-guard the target window.
