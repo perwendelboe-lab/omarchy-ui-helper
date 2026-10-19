@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
-tools=(hyprctl jq wtype grim slurp wl-copy wl-paste tesseract wlrctl ydotool dotool uvx hypruse foot)
+tools=(hyprctl jq wtype grim slurp wl-copy wl-paste tesseract wlrctl ydotool dotool uvx hypruse foot grok-bot grokbot)
 obj='{}'
 for t in "${tools[@]}"; do p=$(command -v "$t" 2>/dev/null || true); [[ -z $p && $t == cua-driver ]] && true; obj=$(jq -c --arg k "$t" --arg v "$p" '.[$k]=(if $v=="" then null else $v end)' <<<"$obj"); done
 cua=$(command -v cua-driver || ls ~/.local/bin/cua-driver 2>/dev/null || true)

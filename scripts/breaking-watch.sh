@@ -8,7 +8,7 @@ KW='breaking|removed?|deprecat|lua|dispatch|wayland|hyprctl|movecursor|cursor|ip
 json_only=0
 while (($#)); do case $1 in --json) json_only=1;; --keywords) KW=$2; shift;; esac; shift; done
 CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/hypr-hands; mkdir -p "$CACHE"
-semver(){ grep -oE '[0-9]+\.[0-9]+\.[0-9]+' <<<"${1:-}" | head -1; }
+semver(){ grep -oE '[0-9]+\.[0-9]+\.[0-9]+' <<<"${1:-}" | head -1 || true; }
 newer(){ [[ $1 != "$2" && $(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -1) == "$2" ]]; }
 gh_api(){ if have gh && gh auth status >/dev/null 2>&1; then gh api "$1"; else curl -fsSL -H 'Accept: application/vnd.github+json' "https://api.github.com/$1"; fi; }
 results=()
@@ -26,8 +26,9 @@ print(json.dumps(out))'); fi
   local filtered="[]"
   while IFS= read -r r; do v=$(jq -r .v <<<"$r"); if [[ -z $inst ]] || newer "$inst" "$v"; then filtered=$(jq -c --argjson r "$r" '.+[$r]' <<<"$filtered"); fi; done < <(jq -c '.[]' <<<"$sel")
   hits=$(jq -r '.[]|.tag as $t|.body|split("\n")[]|select(length>0)|"\($t): \(.)"' <<<"$filtered" | grep -iE "$KW" | cut -c1-220 | head -40 || true)
-  results+=("$(jq -nc --arg n "$name" --arg i "$inst" --arg src "$src" --argjson f "$filtered" --arg h "$hits" \
-    '{name:$n,installed:$i,source:$src,new_versions:[$f[]|.tag],hits:($h|split("\n")|map(select(length>0)))}')")
+  # release bodies go through stdin: --argjson hits ARG_MAX when many versions are new
+  results+=("$(jq -c --arg n "$name" --arg i "$inst" --arg src "$src" --arg h "$hits" \
+    '{name:$n,installed:$i,source:$src,new_versions:[.[]|.tag],hits:($h|split("\n")|map(select(length>0)))}' <<<"$filtered")")
 }
 ci=$(semver "$( (cua-driver --version || ~/.local/bin/cua-driver --version) 2>/dev/null || true)")
 releases_since cua-driver trycua/cua cua-driver-rs-v "$ci"
@@ -36,7 +37,7 @@ releases_since hyprland hyprwm/Hyprland v "$hi"
 # Omarchy publishes tags, not GitHub releases: scan commit subjects since the installed version.
 oraw=$(omarchy version 2>/dev/null || true); oi=$(semver "$oraw"); repo="$CACHE/omarchy.git"
 if [[ -d $repo ]]; then command git -C "$repo" fetch -q --tags origin 2>/dev/null || true
-else git clone -q --bare --filter=blob:none https://github.com/basecamp/omarchy "$repo" 2>/dev/null || true; fi
+else git clone -q --bare --filter=blob:none https://github.com/omacom/omarchy "$repo" 2>/dev/null || true; fi
 from=""; [[ $oraw =~ \.g([0-9a-f]{7,}) ]] && command git -C "$repo" cat-file -e "${BASH_REMATCH[1]}" 2>/dev/null && from=${BASH_REMATCH[1]}
 [[ -z $from && -n $oi ]] && command git -C "$repo" rev-parse -q --verify "v$oi" >/dev/null && from="v$oi"
 latest=$(command git -C "$repo" tag -l 'v*' 2>/dev/null | sort -V | tail -1)

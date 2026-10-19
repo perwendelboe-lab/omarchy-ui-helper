@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# grokbot: open or focus the Grok Bot desktop app (hypr-hands). `grokbot status|bind|install-help` also work.
+HH_HOME=${HYPR_HANDS_HOME:-$HOME/.local/share/hypr-hands}
+exec "$HH_HOME/scripts/grokbot.sh" "$@"

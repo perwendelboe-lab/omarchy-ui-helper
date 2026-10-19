@@ -2,6 +2,19 @@
 
 All notable changes to hypr-hands. Versions follow SemVer.
 
+## 0.5.0 — 2026-10-19
+### Added
+- `hypr-hands grokbot [open|status|bind|install-help]` and a `grokbot` launcher in `~/.local/bin` (symlinked by `install.sh`, removed by `uninstall.sh`): open or focus the Grok Bot desktop app (Lua `hl.dsp.focus` or classic `focuswindow`, launch through `uwsm-app`), report install/run/keybinding state as JSON, print install methods.
+- `grokbot bind [--key …] [--dry-run]`: idempotently adds `Super + Ctrl + G` to `~/.config/hypr/bindings.lua` (Lua config) or `bindings.conf`/`hyprland.conf` (classic), keeps a `.hypr-hands.bak` copy and warns when the combo is already bound.
+- README section and `docs/install-grok-bot.md`: the Grok Bot desktop app is not preinstalled on some Omarchy versions; ready-to-paste prompt for the Omarchy default agent, manual commands (Omarchy repo `grok-bot`, Omarchy's PKGBUILD from the official .deb, AUR `grok-bot-desktop`, debtap), keybinding and alias.
+- `check` lists `grok-bot`/`grokbot`; `update-check` reports the Grok Bot app package; `install.sh` says whether the app is installed.
+### Changed
+- Omarchy URLs moved to `github.com/omacom/omarchy` (Omarchy 4.0.5 renamed its GitHub home); `update-check` and `breaking-watch` use it.
+- Checked against Omarchy 4.0.5: no changes to the Lua config / `hl.dsp` API, `omarchy-menu`, `omarchy-menu-keybindings`, the `omarchy-menu` layer, `uwsm-app`, the bundled `omarchy` skill or the packages hypr-hands uses. Skills and README compatibility notes now say 4.0.0–4.0.5.
+### Fixed
+- `update-check` / `breaking-watch` no longer exit early when a version string is empty (`semver` under `pipefail`).
+- `breaking-watch` passes release notes to jq on stdin instead of `--argjson`, which hit "Argument list too long" when many releases were new.
+
 ## 0.4.0 — 2026-10-15
 ### Added
 - `windows float [ADDR] [toggle|on|off]`, `resize [ADDR] W H` (exact) / `+DX +DY` (relative), `moveto [ADDR] X Y`, `center [ADDR]`, `swap [ADDR] l|r|u|d`, `movedir [ADDR] l|r|u|d`, `focusdir l|r|u|d`, `pseudo [ADDR]`, `split [ADDR]`; Lua (`hl.dsp.window.float/resize/move/swap/center/pseudo`, `hl.dsp.focus({direction})`, `hl.dsp.layout('togglesplit')`) and classic (`togglefloating/setfloating/settiled`, `resizewindowpixel`, `movewindowpixel`, `swapwindow`, `movewindow`, `movefocus`, `centerwindow`, `pseudo`, `togglesplit`) forms in `lib.sh`.

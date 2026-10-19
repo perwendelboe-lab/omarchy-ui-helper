@@ -106,6 +106,9 @@ if ((LINK)); then
   else run "mkdir -p '$HH' && rsync -a --delete --exclude .git '$ROOT/' '$HH/' && echo '$src' > '$HH/.source'"; fi
   if [[ -e $BIN && ! -L $BIN ]]; then echo "  $BIN exists and is not our symlink; leaving it"
   else run "mkdir -p '$HOME/.local/bin' && ln -sfn '$HH/bin/hypr-hands' '$BIN'"; fi
+  GB=$HOME/.local/bin/grokbot   # open-or-focus launcher for the Grok Bot desktop app
+  if [[ -e $GB && ! -L $GB ]]; then echo "  $GB exists and is not our symlink; leaving it"
+  else run "ln -sfn '$HH/bin/grokbot' '$GB'"; fi
   case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) echo "  NOTE: add ~/.local/bin to PATH (or call $BIN directly)";; esac
 fi
 chmod +x "$ROOT"/scripts/*.sh "$ROOT"/*.sh 2>/dev/null || true
@@ -113,4 +116,7 @@ chmod +x "$ROOT"/scripts/*.sh "$ROOT"/*.sh 2>/dev/null || true
 b "7/7 Check"
 if ((DRY)); then echo "  (dry run) would run: $ROOT/scripts/check.sh"; fi
 "$ROOT/scripts/check.sh" | jq -c '{session,lua_repl,locked,click_backend,uinput_writable,cua:.cua_driver.service,missing:[.tools|to_entries[]|select(.value==null)|.key]}'
+if have grok-bot || have sand; then echo "  Grok Bot desktop app: present ($(command -v grok-bot || command -v sand))"
+else echo "  Grok Bot desktop app: NOT installed. See: hypr-hands grokbot install-help"; fi
 echo; echo "Done. Try: hypr-hands check   (scripts: ~/.local/share/hypr-hands/scripts)"
+echo "Optional: hypr-hands grokbot bind   (SUPER + CTRL + G opens/focuses Grok Bot; launcher: grokbot)"

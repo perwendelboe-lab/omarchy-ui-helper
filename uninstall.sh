@@ -14,6 +14,8 @@ ask(){ ((YES)) && return 0; local r; read -rp "  $1 [y/N] " r; [[ ${r,,} == y* ]
 ROOT=$(cd "$(dirname "$0")" && pwd); HH=$HOME/.local/share/hypr-hands; BIN=$HOME/.local/bin/hypr-hands
 echo "== hypr-hands files"
 [[ -L $BIN ]] && run "rm '$BIN'" || echo "  no CLI symlink at $BIN"
+GB=$HOME/.local/bin/grokbot; [[ -L $GB && $(readlink "$GB") == */hypr-hands/bin/grokbot ]] && run "rm '$GB'"
+for f in "${XDG_CONFIG_HOME:-$HOME/.config}"/hypr/bindings.{lua,conf}; do [[ -f $f ]] && grep -q 'hypr-hands: grokbot' "$f" && echo "  NOTE: remove the 'hypr-hands: grokbot' line from $f yourself (Grok Bot keybinding)"; done
 if [[ -d $HH && $ROOT != "$HH" ]]; then run "rm -rf '$HH'"; elif [[ $ROOT == "$HH" ]]; then echo "  running from $HH; delete it yourself afterwards"; else echo "  nothing at $HH"; fi
 old=$HOME/.cursor/plugins/local/hypr-hands; [[ -L $old || -f $old/.hypr-hands-installed ]] && run "rm -rf '$old'"   # pre-0.3 location
 run "rm -rf '${XDG_CACHE_HOME:-$HOME/.cache}/hypr-hands' '${XDG_RUNTIME_DIR:-/tmp}/hypr-hands'"

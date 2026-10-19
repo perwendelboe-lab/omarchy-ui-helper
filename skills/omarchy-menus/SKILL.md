@@ -10,4 +10,4 @@ Run via Shell with the user's Omarchy `machineId`. Menus are keyboard-filtered l
 3. Confirm the layer is up: `hyprctl layers -j | jq '[.[].levels[][]|.namespace]'` contains `omarchy-menu`. The menu takes keyboard focus while `activewindow` still reports the underlying window.
 4. `hypr-hands type 'Full screen'`, check with `hypr-hands shot` / `ocr-find`, then `hypr-hands key Return`.
 5. Verify the effect (e.g. `hyprctl clients -j` fullscreen). Cancel with `hypr-hands key Escape` only while the menu layer is present.
-Works the same on Omarchy stable (4.0.x) and edge: `omarchy-menu-keybindings`, `omarchy-menu` and the `omarchy-menu` layer namespace exist in both. Never edit `/usr/share/omarchy`.
+Works the same on Omarchy stable (4.0.0–4.0.5) and edge: `omarchy-menu-keybindings`, `omarchy-menu` and the `omarchy-menu` layer namespace exist in both. Never edit `/usr/share/omarchy`.

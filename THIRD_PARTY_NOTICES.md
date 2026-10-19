@@ -2,7 +2,7 @@
 
 hypr-hands is MIT © 2026 PWN. It is an independent project, not affiliated with or endorsed by Basecamp/Omarchy, Cua AI, the Hyprland project, or any tool listed below.
 
-## Omarchy (https://github.com/basecamp/omarchy) — MIT
+## Omarchy (https://github.com/omacom/omarchy) — MIT
 
 `skills/omarchy/` is copied and adapted from the agent skill bundled with Omarchy
 (`default/agents/skills/omarchy`). `capture.md`, `contributing.md`, `hooks.md` and

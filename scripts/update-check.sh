@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # update-check.sh [--json] [--apply]
-# Installed vs latest for cua-driver, Omarchy, Hyprland, wlrctl, ydotool, hypr-hands.
+# Installed vs latest for cua-driver, Omarchy, Hyprland, wlrctl, ydotool, Grok Bot desktop app, hypr-hands.
 # Uses `git ls-remote` for upstream tags (no GitHub API rate limit). Read-only unless --apply
 # (which only runs the official, sudo-free `cua-driver update --apply`).
 . "$(dirname "$0")/lib.sh"
@@ -12,7 +12,7 @@ for a in "$@"; do case $a in --json) json_only=1;; --apply) apply=1;; -h|--help)
 latest_tag(){ # repo prefix -> highest semver tag (stable only)
   git ls-remote --tags --refs "https://github.com/$1" 2>/dev/null | awk -F/ '{print $3}' \
     | grep -E "^$2[0-9]+\.[0-9]+\.[0-9]+$" | sed "s/^$2//" | sort -V | tail -1; }
-semver(){ grep -oE '[0-9]+\.[0-9]+\.[0-9]+' <<<"${1:-}" | head -1; }
+semver(){ grep -oE '[0-9]+\.[0-9]+\.[0-9]+' <<<"${1:-}" | head -1 || true; }
 cmp(){ # installed latest -> status
   local i=$1 l=$2
   [[ -z $i ]] && { echo not-installed; return; }; [[ -z $l ]] && { echo unknown; return; }
@@ -39,13 +39,13 @@ add cua-driver "$ci" "$cl" "$cs" "$(major "$ci" "$cl")" "github.com/trycua/cua t
 # Omarchy
 oraw=$(omarchy version 2>/dev/null || cat /usr/share/omarchy/version 2>/dev/null || true); oi=$(semver "$oraw")
 opkg=$(pacman -Qq omarchy omarchy-dev 2>/dev/null | head -1 || true)
-ol=$(latest_tag basecamp/omarchy v); os=$(cmp "$oi" "$ol")
+ol=$(latest_tag omacom/omarchy v); os=$(cmp "$oi" "$ol")
 onote="installed '$oraw' (package ${opkg:-?}); update: omarchy update"
-osrc="github.com/basecamp/omarchy tags"
+osrc="github.com/omacom/omarchy tags"
 if [[ $opkg == omarchy-dev && $oraw =~ \.g([0-9a-f]{7,}) ]]; then
   # dev channel builds a git commit of the default branch: compare commits, not tags
-  oc=${BASH_REMATCH[1]}; oh=$(git ls-remote https://github.com/basecamp/omarchy HEAD 2>/dev/null | cut -c1-${#oc})
-  osrc="github.com/basecamp/omarchy HEAD (dev channel)"; onote+="; dev channel at commit $oc, upstream HEAD ${oh:-?}; latest stable tag v$ol"
+  oc=${BASH_REMATCH[1]}; oh=$(git ls-remote https://github.com/omacom/omarchy HEAD 2>/dev/null | cut -c1-${#oc})
+  osrc="github.com/omacom/omarchy HEAD (dev channel)"; onote+="; dev channel at commit $oc, upstream HEAD ${oh:-?}; latest stable tag v$ol"
   [[ -n $oh ]] && { [[ $oh == "$oc" ]] && os=up-to-date || os=update-available; } || os=unknown
   oi="$oi+$oc"; ol="${oh:+HEAD@$oh}"
 fi
@@ -61,6 +61,12 @@ for p in wlrctl ydotool; do
   st=$(cmp "$(semver "$pi")" "$(semver "${pl#* }")"); [[ -n $pi && $pi == "${pl#* }" ]] && st=up-to-date
   add "$p" "$pi" "${pl#* }" "$st" false "${pl%% *}" "$( [[ ${pl%% *} == aur ]] && echo "yay -S aur/$p" || echo "sudo pacman -S $p")"
 done
+# Grok Bot desktop app (package grok-bot from Omarchy's repo, or an AUR repack)
+gp=$(pacman -Qq grok-bot grok-bot-desktop grok-bot-bin grokbot-linux-port-bin 2>/dev/null | head -1 || true)
+if [[ -n $gp ]]; then gi=$(pacman -Q "$gp" | awk '{print $2}'); gl=$(pkg_latest "$gp" || true)
+  gs=$(cmp "$(semver "$gi")" "$(semver "${gl#* }")"); [[ $gi == "${gl#* }" ]] && gs=up-to-date
+  add grok-bot "$gi" "${gl#* }" "$gs" false "${gl%% *} $gp" "$( [[ ${gl%% *} == aur ]] && echo "yay -S $gp" || echo "sudo pacman -S $gp (or omarchy update)")"
+else add grok-bot "" "" not-installed false "-" "not installed; see: hypr-hands grokbot install-help"; fi
 # hypr-hands: installed copy (~/.local/share/hypr-hands/.source) or git clone, vs GitHub main
 UPSTREAM=${HYPR_HANDS_REPO:-https://github.com/perwendelboe-lab/omarchy-ui-helper}
 hv=$(jq -r .version "$ROOT/plugin.json"); clone=""
