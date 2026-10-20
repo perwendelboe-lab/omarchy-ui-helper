@@ -137,9 +137,12 @@ WantedBy=default.target
 `systemctl --user daemon-reload && systemctl --user enable --now cua-driver.service && cua-driver doctor`.
 Update: `cua-driver update --apply && systemctl --user restart cua-driver.service`.
 
-## Optional: ydotool (drag + fallback click/scroll) — default off
+**Drag uses Cua first (v0.6.0).** When the daemon runs (with `CUA_DRIVER_RS_ENABLE_WAYLAND=1`), `hypr-hands drag X1 Y1 X2 Y2` calls Cua's desktop-scope drag (`cua-driver call drag '{"scope":"desktop",...}'`), which holds the button through `zwlr_virtual_pointer_v1` for the whole gesture: one press, interpolated motion, one release. hypr-hands converts its logical px to Cua's physical desktop frame (Cua frame ÷ logical layout, e.g. ×1.5 at scale 1.5), keeps the lock check, the verified move to the start and the target guard, checks the end cursor position, and prints `"backend":"cua-driver-vptr"`. `hypr-hands check` reports `drag_backend`. With more than one monitor it uses Cua only when forced with `HYPR_HANDS_DRAG_BACKEND=cua`, because that frame mapping has not been tested on multi-monitor setups yet. Drags with modifier keys held are refused.
 
-- **Enables:** `drag` (button hold; wlrctl can only click) and click/scroll when wlrctl is missing.
+## Optional: ydotool (fallback only) — default off
+
+Only needed as a fallback: `drag` uses Cua Driver when its daemon runs (see above).
+- **Enables:** `drag` when Cua Driver is not available (button hold; wlrctl can only click), and click/scroll when wlrctl is missing.
 - **Risk:** system-wide input injection through `/dev/uinput`; anything in the `input` group can type/click into any window. hypr-hands only uses it with `HYPR_HANDS_ALLOW_UINPUT=1`.
 - **Setup:**
   ```bash
@@ -167,7 +170,7 @@ Update: `cua-driver update --apply && systemctl --user restart cua-driver.servic
 - **Target guard:** `HYPR_HANDS_REQUIRE_CLASS=<prefix>` — click/scroll/drag refuse unless the focused window and the window under the cursor match; type/key require the focused window (exit 8).
 - **Locked screen:** input refused while `hyprlock` runs (exit 3). **Verified pointer:** ±2 px `cursorpos` check (exit 4). **Secrets:** `type` refuses secret-looking text (exit 6).
 - **uinput opt-in:** ydotool only with `HYPR_HANDS_ALLOW_UINPUT=1`. The bot never runs sudo; installs needing root are handed to you.
-- Backend order: Cua Driver (accessibility) → Lua cursor move + `wlrctl` → `hypruse` → `ydotool` (opt-in).
+- Backend order: Cua Driver (accessibility) → Lua cursor move + `wlrctl` → `hypruse` → `ydotool` (opt-in). Drag: Cua Driver desktop drag (virtual pointer) → `ydotool` (opt-in).
 
 ## Troubleshooting
 
@@ -181,6 +184,8 @@ Update: `cua-driver update --apply && systemctl --user restart cua-driver.servic
 | `Super + Ctrl + G` does nothing | `hypr-hands grokbot status` → `keybinding.installed`; check `hyprctl binds` for a clash, then `hyprctl reload`. |
 | `hypr-hands: command not found` | Add `~/.local/bin` to PATH or call `~/.local/share/hypr-hands/bin/hypr-hands`. |
 | `click` exit 5 "no click backend" | Install wlrctl or opt in to ydotool. |
+| `drag` exit 5 "no drag backend" | Start the Cua Driver daemon with `CUA_DRIVER_RS_ENABLE_WAYLAND=1` (`systemctl --user start cua-driver.service`), or opt in to ydotool. The error says why Cua was skipped (not installed, daemon down, multi-monitor, frame mismatch). |
+| `drag` exit 11 "cua-driver drag failed" | Cua failed after it may have started the gesture; check the screen before retrying. `cua-driver doctor`. |
 | sudo/pacman hangs when the bot runs it | No TTY for the password; run that command yourself. |
 | `dispatch failed` (exit 9) | Wrong dispatch style forced or detected; unset `HYPR_HANDS_DISPATCH` and check `hypr-hands check` → `dispatch`. |
 | HiDPI coordinates off | Scripts use logical px; screenshots are physical; see `hypr-hands geom`. |
@@ -195,6 +200,7 @@ Omarchy 4.0.0 (dev), Hyprland 0.56.2 (Lua config), eDP-1 1920×1080 @1.5, wlrctl
 | click left/right/middle (wlrctl); ydotool fallback | ✅ (foot mouse log, GTK4 button) |
 | scroll 4 directions | ✅ |
 | drag (Lua moves + ydotool down/up) | ✅ (GTK4 GestureDrag exact) |
+| drag via Cua Driver 0.37.0 desktop drag (v0.6.0, `cua-driver-vptr`) | ⚠️ virtual test only: headless sway 1.12 (Hyprland 0.56.2 needs a GPU the test box lacks), GTK4 GestureDrag + `wev`: 1 press, 20 held motions, 1 release at the target; scale 1 and 1.5 ✅. Not yet tested on real Omarchy/Hyprland |
 | type / key incl. chords | ✅ (raw byte log) |
 | target guard, secret refusal | ✅ · lock refusal ⚠️ not exercised live |
 | shot full, ocr-find, clip | ✅ · shot region/select/window ⚠️ untested |

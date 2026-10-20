@@ -72,3 +72,27 @@ ydo(){
   [[ -S ${YDOTOOL_SOCKET:-} ]] || die "ydotoold socket not found; run: systemctl --user enable --now ydotool.service" 5
   ydotool "$@" >/dev/null
 }
+# Cua Driver (optional). cua_bin: path or empty. cua_ready: `cua-driver status` says the daemon runs
+# (it must have been started with CUA_DRIVER_RS_ENABLE_WAYLAND=1 to inject input on Wayland).
+cua_bin(){ command -v cua-driver 2>/dev/null || { [[ -x $HOME/.local/bin/cua-driver ]] && echo "$HOME/.local/bin/cua-driver"; } || true; }
+cua_ready(){ local b out; b=$(cua_bin); [[ -n $b ]] || return 1; out=$("$b" status 2>/dev/null) || return 1; [[ $out == *"daemon is running"* ]]; }
+# Logical layout box of active monitors (hyprctl cursorpos frame): "minx miny width height count"
+layout_box(){ hyprctl monitors -j | jq -r '[.[]|select(.disabled|not)
+  | {x,y,w:((if (.transform%2)==1 then .height else .width end)/.scale),h:((if (.transform%2)==1 then .width else .height end)/.scale)}]
+  | (map(.x)|min) as $x | (map(.y)|min) as $y
+  | "\($x) \($y) \((map(.x+.w)|max)-$x) \((map(.y+.h)|max)-$y) \(length)"'; }
+# Cua desktop action frame size "W H" (get_desktop_state; the capture goes to a temp file that is deleted).
+cua_desktop_size(){
+  local b t out; b=$(cua_bin); [[ -n $b ]] || return 1
+  t=$(mktemp -p "${XDG_RUNTIME_DIR:-/tmp}" hh-cua-XXXXXX.png)
+  out=$("$b" call get_desktop_state "$(jq -nc --arg f "$t" '{screenshot_out_file:$f}')" 2>/dev/null) || { rm -f "$t"; return 1; }
+  rm -f "$t"; jq -er '"\(.screen_width) \(.screen_height)"' <<<"$out"; }
+# Which drag backend drag.sh would pick now: cua-driver-vptr | ydotool | none (HYPR_HANDS_DRAG_BACKEND=auto|cua|ydotool)
+drag_backend(){
+  local want=${HYPR_HANDS_DRAG_BACKEND:-auto} cnt
+  if [[ $want != ydotool ]] && cua_ready; then
+    cnt=$(layout_box 2>/dev/null | awk '{print $5}')
+    if [[ $want == cua || ${cnt:-0} == 1 ]]; then echo cua-driver-vptr; return; fi
+  fi
+  if [[ $want != cua ]] && have ydotool && [[ ${HYPR_HANDS_ALLOW_UINPUT:-0} == 1 ]]; then echo ydotool; return; fi
+  echo none; }

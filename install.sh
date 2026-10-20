@@ -73,9 +73,10 @@ U
   run "systemctl --user daemon-reload && systemctl --user enable --now cua-driver.service"
 elif [[ -f $unit ]]; then echo "  unit exists: $unit ($(systemctl --user is-active cua-driver.service 2>/dev/null || true))"; fi
 
-b "5/7 Optional: ydotool (drag + fallback click/scroll)  — default NO"
+b "5/7 Optional: ydotool (drag fallback + fallback click/scroll)  — default NO"
 cat <<'T'
-  Enables: drag.sh (button hold), and click/scroll when wlrctl is missing.
+  Enables: drag.sh fallback when Cua Driver is not available (drag uses Cua first),
+           and click/scroll when wlrctl is missing.
   Risk:    ydotool injects input system-wide through /dev/uinput. Anything in the
            'input' group can then type/click into ANY window, including the lock
            screen prompt and terminals. hypr-hands only uses it when
@@ -96,7 +97,7 @@ elif ((WITH_YDO)) || { ((!YES)) && ask "Set up ydotool now?" n; }; then
   run "sudo usermod -aG input \"\$USER\""
   run "systemctl --user enable ydotool.service"
   echo "  -> Log out and back in, then: systemctl --user start ydotool.service"
-else echo "  skipped (recommended unless you need drag)"; fi
+else echo "  skipped (recommended; drag uses Cua Driver when its daemon runs)"; fi
 
 b "6/7 Install hypr-hands to ~/.local/share/hypr-hands + CLI ~/.local/bin/hypr-hands"
 HH=$HOME/.local/share/hypr-hands; BIN=$HOME/.local/bin/hypr-hands

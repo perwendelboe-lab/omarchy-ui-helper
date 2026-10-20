@@ -2,6 +2,18 @@
 
 All notable changes to hypr-hands. Versions follow SemVer.
 
+## 0.6.0 — 2026-10-20
+### Changed
+- `drag` is Cua-first: when `cua-driver` is installed and its daemon is running (started with `CUA_DRIVER_RS_ENABLE_WAYLAND=1`), it calls Cua Driver's desktop-scope drag, which holds the button over `zwlr_virtual_pointer_v1` for the whole gesture (one press, interpolated motion, one release) and prints `"backend":"cua-driver-vptr"`. Logical px are converted to Cua's physical desktop frame (Cua `get_desktop_state` size ÷ logical monitor layout; refused if the two axes disagree). It keeps the lock check, the verified move to the start and the target guard, and checks the end cursor position (exit 4). ydotool stays the opt-in fallback (`HYPR_HANDS_ALLOW_UINPUT=1`), used when Cua is unavailable or refuses before sending input; a Cua failure after that is exit 11 with no retry.
+- With more than one monitor, Cua drag is used only with `HYPR_HANDS_DRAG_BACKEND=cua` (untested frame mapping). `HYPR_HANDS_DRAG_BACKEND=auto|cua|ydotool`, `HYPR_HANDS_DRAG_MS` (default 500), steps default 20.
+- Drags with modifier keys are refused explicitly (non-integer arguments such as `--shift` → exit 2).
+- README: ydotool is only needed as a fallback; tested-matrix row for the virtual Cua drag test. Skills `hypr-pointer`, `hypr-computer-use`, `cua-driver-local-computer-use` describe the Cua-first drag and Cua's physical desktop frame.
+### Added
+- `check` reports `drag_backend` (`cua-driver-vptr` | `ydotool` | `none`).
+- `lib.sh`: `cua_bin`, `cua_ready`, `layout_box`, `cua_desktop_size`, `drag_backend`.
+### Tested
+- Virtual only: Hyprland 0.56.2 (Arch) could not start on the GPU-less test box (Aquamarine: no DRM, "no allocator available"), so headless sway 1.12 (pixman) with cua-driver 0.37.0 was used. A GTK4 GestureDrag client and `wev` logged one press, 20 held motions and one release at the target, at scale 1 and 1.5. `check`, `move`, `click` (wlrctl) and `drag` ran through a test-only `hyprctl` shim. Needs a confirming run on real Omarchy.
+
 ## 0.5.0 — 2026-10-19
 ### Added
 - `hypr-hands grokbot [open|status|bind|install-help]` and a `grokbot` launcher in `~/.local/bin` (symlinked by `install.sh`, removed by `uninstall.sh`): open or focus the Grok Bot desktop app (Lua `hl.dsp.focus` or classic `focuswindow`, launch through `uwsm-app`), report install/run/keybinding state as JSON, print install methods.

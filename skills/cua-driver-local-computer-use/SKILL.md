@@ -61,6 +61,7 @@ cua-driver call end_session '{"session":"run-1"}'
 
 - Native Wayland needs `CUA_DRIVER_RS_ENABLE_WAYLAND=1` for reliable window discovery.
 - Hyprland/Omarchy: discovery works; **background raw input is experimental**. Prefer AT-SPI / `element_token` actions. On `background_unavailable`, reobserve and **ask** before `delivery_mode:"foreground"` or desktop-scope input — never escalate silently.
+- Desktop-scope drag (`drag` with `"scope":"desktop"`) goes through `zwlr_virtual_pointer_v1`: one press, held interpolated motion, one release. Its `from_x/from_y/to_x/to_y` are in the **physical** pixel frame of `get_desktop_state` (`screen_width`×`screen_height`), not Hyprland's logical px: at scale 1.5, logical (200,200) is Cua (300,300). The result is `effect:"unverifiable"`, so check the outcome yourself. On Hyprland, prefer `hypr-hands drag X1 Y1 X2 Y2` (logical px): it does the conversion, target guard and end-position check, and calls this Cua drag for you.
 - `surface_identity_unproven` on screenshots: do not invent pixels from a desktop crop. Use semantic tree actions, or ask before authorized `get_desktop_state` + desktop `target`.
 - Portal/OS permission dialogs belong to the user. Never automate approval or weaken security settings.
 
@@ -76,7 +77,7 @@ cua-driver call end_session '{"session":"run-1"}'
 
 ## Pointer/keyboard fallback: hypr-hands (Hyprland/Omarchy)
 
-When AT-SPI tokens are unavailable or `background_unavailable` persists, and the user has approved foreground input, fall back to hypr-hands (`hypr-hands <cmd>` or `~/.local/share/hypr-hands/scripts/<cmd>.sh`, same machineId): `geom`/`ocr-find` to locate, `move` (verified), `click`, `scroll`, `type`, `key`, `drag` (ydotool opt-in). Set `HYPR_HANDS_REQUIRE_CLASS=<target class prefix>` so input is refused unless the target window is focused and under the cursor. Always `end_session` your cua run label first.
+When AT-SPI tokens are unavailable or `background_unavailable` persists, and the user has approved foreground input, fall back to hypr-hands (`hypr-hands <cmd>` or `~/.local/share/hypr-hands/scripts/<cmd>.sh`, same machineId): `geom`/`ocr-find` to locate, `move` (verified), `click`, `scroll`, `type`, `key`, `drag` (Cua desktop drag first, ydotool only as the opt-in fallback). Set `HYPR_HANDS_REQUIRE_CLASS=<target class prefix>` so input is refused unless the target window is focused and under the cursor. Always `end_session` your cua run label first.
 
 ### Hyprland dispatch: Lua config (Omarchy 4.x) vs classic
 

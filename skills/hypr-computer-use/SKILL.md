@@ -16,7 +16,8 @@ Some Omarchy versions do not preinstall the Grok Bot app. `hypr-hands grokbot st
 
 ## Backend order
 1. **Cua Driver first** (skill `cua-driver-local-computer-use`): accessibility actions, no pointer takeover. End with `end_session`.
-2. **Pointer/keyboard fallback**: `hypr-hands move|click|scroll|drag|type|key` (wlrctl; ydotool only with `HYPR_HANDS_ALLOW_UINPUT=1`).
+2. **Pointer/keyboard fallback**: `hypr-hands move|click|scroll|drag|type|key` (wlrctl for click/scroll; ydotool only with `HYPR_HANDS_ALLOW_UINPUT=1`).
+3. **Drag**: `hypr-hands drag` uses the Cua Driver desktop drag first (`backend:"cua-driver-vptr"`, a real held press over the Wayland virtual pointer) when the cua-driver daemon runs, and falls back to ydotool only with `HYPR_HANDS_ALLOW_UINPUT=1`. `hypr-hands check` → `drag_backend` shows which one applies. A drag takes over the user's pointer, so ask first.
 
 ## Loop: observe → act → verify
 1. `hypr-hands check` once; `hypr-hands describe` / `geom` to observe; `shot` + `ocr-find TEXT` to locate (read screenshots with Read + machineId).
@@ -32,5 +33,5 @@ Some Omarchy versions do not preinstall the Grok Bot app. `hypr-hands grokbot st
 - Never act on a locked screen (scripts refuse while `hyprlock` runs).
 - Verify cursor position before clicks (`click left X Y` does it, ±2px).
 - Never type secrets (`type` refuses secret-looking text).
-- ydotool/uinput is opt-in. Never run sudo/pacman/yay yourself (no TTY; they hang) — give the user the command.
+- ydotool/uinput is opt-in; drag needs no uinput when Cua Driver is running. Drags with modifier keys held are refused. Never run sudo/pacman/yay yourself (no TTY; they hang) — give the user the command.
 - Don't close or move windows you didn't open (ask first); snapshot before rearranging and offer restore after; record and restore the cursor position and focus.
