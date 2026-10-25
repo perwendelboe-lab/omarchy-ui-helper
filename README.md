@@ -98,7 +98,7 @@ Update: `git -C ~/code/omarchy-ui-helper pull && ~/code/omarchy-ui-helper/instal
 
 ## Compatibility (Omarchy channels)
 
-| | Edge / dev (tested) | Stable 4.0.x (4.0.0–4.0.5) | Omarchy 3.x / plain Hyprland `.conf` |
+| | Edge / dev (tested) | Stable 4.0.x (4.0.0–4.0.6) | Omarchy 3.x / plain Hyprland `.conf` |
 |---|---|---|---|
 | Hyprland | 0.56.2 (Lua config) | 0.56.x (Lua config) | classic hyprlang |
 | Dispatch used | `hyprctl repl` + `hl.dsp.*` | same | `hyprctl dispatch …` (auto-detected; untested live) |
@@ -109,7 +109,7 @@ Update: `git -C ~/code/omarchy-ui-helper pull && ~/code/omarchy-ui-helper/instal
 
 Force a style with `HYPR_HANDS_DISPATCH=lua|classic`; `HYPR_HANDS_DRYRUN=1` prints dispatch commands instead of running them.
 
-Omarchy 4.0.5 (October 2026) changes nothing hypr-hands depends on: same Hyprland Lua config and `hl.dsp` dispatch, same `omarchy-menu` / `omarchy-menu-keybindings` and `omarchy-menu` layer, same bundled `omarchy` skill, same packages. Its GitHub home is now `omacom/omarchy` (the old `basecamp/omarchy` URLs redirect); `update-check` and `breaking-watch` use the new one.
+Omarchy 4.0.5 and 4.0.6 (October 2026) change nothing hypr-hands depends on: same Hyprland Lua config and `hl.dsp` dispatch, same `omarchy-menu` / `omarchy-menu-keybindings` and `omarchy-menu` layer, same bundled `omarchy` skill, same packages. Its GitHub home is now `omacom/omarchy` (the old `basecamp/omarchy` URLs redirect); `update-check` and `breaking-watch` use the new one.
 
 ## Cua Driver (recommended)
 

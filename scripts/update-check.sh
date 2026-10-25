@@ -65,7 +65,14 @@ done
 gp=$(pacman -Qq grok-bot grok-bot-desktop grok-bot-bin grokbot-linux-port-bin 2>/dev/null | head -1 || true)
 if [[ -n $gp ]]; then gi=$(pacman -Q "$gp" | awk '{print $2}'); gl=$(pkg_latest "$gp" || true)
   gs=$(cmp "$(semver "$gi")" "$(semver "${gl#* }")"); [[ $gi == "${gl#* }" ]] && gs=up-to-date
-  add grok-bot "$gi" "${gl#* }" "$gs" false "${gl%% *} $gp" "$( [[ ${gl%% *} == aur ]] && echo "yay -S $gp" || echo "sudo pacman -S $gp (or omarchy update)")"
+  # Upstream truth: the Linux update feed the app itself follows (Omarchy's hourly sync reads the same feed).
+  # pacman -Si only reflects the local sync DB, which is stale until the next `pacman -Sy`/omarchy update.
+  ga=$([[ $(uname -m) == aarch64 ]] && echo arm64 || echo x64)
+  nil=$(printf '%08d-%04d-%04d-%04d-%012d' 0 0 0 0 0)  # all-zero placeholder id the feed expects (built here so it is not mistaken for a real UUID)
+  gf=$(curl -fsS --max-time 15 "https://api2.cursor.sh/updates/api/update/linux-$ga/sand/0.0.0/$nil/stable" 2>/dev/null | jq -r '.version // empty' || true)
+  gfs=$(cmp "$(semver "$gi")" "$gf")
+  [[ $gfs == update-available && $gs != update-available ]] && gs=update-available
+  add grok-bot "$gi" "${gf:-${gl#* }}" "$gs" false "feed $ga; ${gl%% *} $gp ${gl#* }" "$( [[ ${gl%% *} == aur ]] && echo "yay -S $gp" || echo "sudo pacman -Syu $gp (or omarchy update); if the repo lags the feed, wait ~1h for Omarchy's sync")"
 else add grok-bot "" "" not-installed false "-" "not installed; see: hypr-hands grokbot install-help"; fi
 # hypr-hands: installed copy (~/.local/share/hypr-hands/.source) or git clone, vs GitHub main
 UPSTREAM=${HYPR_HANDS_REPO:-https://github.com/perwendelboe-lab/omarchy-ui-helper}

@@ -2,6 +2,11 @@
 
 All notable changes to hypr-hands. Versions follow SemVer.
 
+## 0.6.1 — 2026-10-25
+### Changed
+- `update-check` now compares the installed Grok Bot desktop app with the official Linux update feed, not only `pacman -Si`. The app ships a new version almost daily and pacman's package list lags, so a stale app was easy to miss. It reports `update-available` when the feed is newer and keeps the pacman/AUR version in `source`; if the feed can't be reached it falls back to the old behaviour.
+- Compatibility notes cover Omarchy 4.0.6 (update and lock-screen fixes only; nothing hypr-hands uses changed). Omarchy 4.5 is in release candidate and is reported to translate menus, so match menu entries by what is on screen.
+
 ## 0.6.0 — 2026-10-20
 ### Changed
 - `drag` is Cua-first: when `cua-driver` is installed and its daemon is running (started with `CUA_DRIVER_RS_ENABLE_WAYLAND=1`), it calls Cua Driver's desktop-scope drag, which holds the button over `zwlr_virtual_pointer_v1` for the whole gesture (one press, interpolated motion, one release) and prints `"backend":"cua-driver-vptr"`. Logical px are converted to Cua's physical desktop frame (Cua `get_desktop_state` size ÷ logical monitor layout; refused if the two axes disagree). It keeps the lock check, the verified move to the start and the target guard, and checks the end cursor position (exit 4). ydotool stays the opt-in fallback (`HYPR_HANDS_ALLOW_UINPUT=1`), used when Cua is unavailable or refuses before sending input; a Cua failure after that is exit 11 with no retry.
