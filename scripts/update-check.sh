@@ -49,6 +49,14 @@ if [[ $opkg == omarchy-dev && $oraw =~ \.g([0-9a-f]{7,}) ]]; then
   [[ -n $oh ]] && { [[ $oh == "$oc" ]] && os=up-to-date || os=update-available; } || os=unknown
   oi="$oi+$oc"; ol="${oh:+HEAD@$oh}"
 fi
+if [[ $opkg == omarchy && $oraw =~ ^([0-9]+\.[0-9]+\.[0-9]+)rc([0-9]+) ]]; then
+  # rc channel: pacman version 4.5.0rc2-1 <-> tag v4.5.0-rc2; compare against the newest rc or stable tag
+  orc="${BASH_REMATCH[1]}-rc${BASH_REMATCH[2]}"
+  olr=$(git ls-remote --tags --refs https://github.com/omacom/omarchy 2>/dev/null | awk -F/ '{print $3}' \
+    | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?$' | sed 's/^v//; s/-rc/~rc/' | sort -V | sed 's/~rc/-rc/' | tail -1)
+  oi=$orc; ol=${olr:-$ol}; osrc="github.com/omacom/omarchy tags (rc channel)"; onote+="; rc channel"
+  if [[ -z $olr ]]; then os=unknown; elif [[ $olr == "$orc" ]]; then os=up-to-date; else os=update-available; fi
+fi
 add omarchy "$oi" "$ol" "$os" "$(major "$(semver "$oi")" "$(semver "$ol")")" "$osrc" "$onote"
 # Hyprland
 hi=$(semver "$(hyprctl version 2>/dev/null | grep -m1 -oE 'Tag: v[0-9.]+' || true)"); [[ -z $hi ]] && hi=$(semver "$(pacman -Q hyprland 2>/dev/null || true)")

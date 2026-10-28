@@ -39,8 +39,10 @@ oraw=$(omarchy version 2>/dev/null || true); oi=$(semver "$oraw"); repo="$CACHE/
 if [[ -d $repo ]]; then command git -C "$repo" fetch -q --tags origin 2>/dev/null || true
 else git clone -q --bare --filter=blob:none https://github.com/omacom/omarchy "$repo" 2>/dev/null || true; fi
 from=""; [[ $oraw =~ \.g([0-9a-f]{7,}) ]] && command git -C "$repo" cat-file -e "${BASH_REMATCH[1]}" 2>/dev/null && from=${BASH_REMATCH[1]}
+[[ -z $from && $oraw =~ ^([0-9]+\.[0-9]+\.[0-9]+)rc([0-9]+) ]] && command git -C "$repo" rev-parse -q --verify "v${BASH_REMATCH[1]}-rc${BASH_REMATCH[2]}" >/dev/null \
+  && from="v${BASH_REMATCH[1]}-rc${BASH_REMATCH[2]}"  # rc channel: pacman 4.5.0rc2-1 = tag v4.5.0-rc2
 [[ -z $from && -n $oi ]] && command git -C "$repo" rev-parse -q --verify "v$oi" >/dev/null && from="v$oi"
-latest=$(command git -C "$repo" tag -l 'v*' 2>/dev/null | sort -V | tail -1)
+latest=$(command git -C "$repo" tag -l 'v*' 2>/dev/null | sed 's/-rc/~rc/' | sort -V | sed 's/~rc/-rc/' | tail -1)  # v4.5.0 sorts after v4.5.0-rc2
 range="${from:+$from..}origin/HEAD"; command git -C "$repo" rev-parse -q --verify origin/HEAD >/dev/null 2>&1 || range="${from:+$from..}HEAD"
 log=$(command git -C "$repo" log --format='%h %s' "$range" 2>/dev/null | head -400 || true)
 ncommits=$(grep -c . <<<"$log" || true)

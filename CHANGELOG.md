@@ -2,6 +2,12 @@
 
 All notable changes to hypr-hands. Versions follow SemVer.
 
+## 0.6.2 — 2026-10-28
+### Fixed
+- `update-check` and `breaking-watch` handle the Omarchy release-candidate package version (`4.5.0rc2-1` = tag `v4.5.0-rc2`). Before, an RC install was reported as "ahead" of stable and `breaking-watch` scanned the whole commit history. Tags now sort so `v4.5.0` is newer than `v4.5.0-rc2`.
+### Compatibility
+- Read against Omarchy 4.5.0-rc2: same Hyprland 0.56.2 and `hl.dsp` calls, same `o.bind` / `o.rebind` signature, Super+Ctrl+G still unbound. Two behaviour changes: the keybindings menu shows translated descriptions in non-English setups (match what is on screen), and each monitor gets its own block of workspaces (matters with more than one monitor). Not yet run on a live RC2 session.
+
 ## 0.6.1 — 2026-10-25
 ### Changed
 - `update-check` now compares the installed Grok Bot desktop app with the official Linux update feed, not only `pacman -Si`. The app ships a new version almost daily and pacman's package list lags, so a stale app was easy to miss. It reports `update-available` when the feed is newer and keeps the pacman/AUR version in `source`; if the feed can't be reached it falls back to the old behaviour.
