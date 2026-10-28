@@ -166,7 +166,7 @@ Only needed as a fallback: `drag` uses Cua Driver when its daemon runs (see abov
 - **Target guard:** `HYPR_HANDS_REQUIRE_CLASS=<prefix>` — click/scroll/drag refuse unless the focused window and the window under the cursor match; type/key require the focused window (exit 8).
 - **Locked screen:** input refused while `hyprlock` runs (exit 3). **Verified pointer:** ±2 px `cursorpos` check (exit 4). **Secrets:** `type` refuses secret-looking text (exit 6).
 - **uinput opt-in:** ydotool only with `HYPR_HANDS_ALLOW_UINPUT=1`. The bot never runs sudo; installs needing root are handed to you.
-- Backend order: Cua Driver (accessibility) → Lua cursor move + `wlrctl` → `hypruse` → `ydotool` (opt-in). Drag: Cua Driver desktop drag (virtual pointer) → `ydotool` (opt-in).
+- Backend order: Cua Driver (accessibility) → Lua cursor move + `wlrctl` (only if you already have it) → `hypruse` → `ydotool` (opt-in). Drag: Cua Driver desktop drag (virtual pointer) → `ydotool` (opt-in).
 
 ## Troubleshooting
 
@@ -179,7 +179,7 @@ Only needed as a fallback: `drag` uses Cua Driver when its daemon runs (see abov
 | `grokbot` exit 10 "Grok Bot desktop app not found" | Install the app first: `hypr-hands grokbot install-help`. |
 | `Super + Ctrl + G` does nothing | `hypr-hands grokbot status` → `keybinding.installed`; check `hyprctl binds` for a clash, then `hyprctl reload`. |
 | `hypr-hands: command not found` | Add `~/.local/bin` to PATH or call `~/.local/share/hypr-hands/bin/hypr-hands`. |
-| `click` exit 5 "no click backend" | Install wlrctl or opt in to ydotool. |
+| `click` exit 5 "no click backend" | Opt in to ydotool (`sudo pacman -S ydotool`, `HYPR_HANDS_ALLOW_UINPUT=1`) or use Cua Driver. wlrctl is AUR-only and is not recommended. |
 | `drag` exit 5 "no drag backend" | Start the Cua Driver daemon with `CUA_DRIVER_RS_ENABLE_WAYLAND=1` (`systemctl --user start cua-driver.service`), or opt in to ydotool. The error says why Cua was skipped (not installed, daemon down, multi-monitor, frame mismatch). |
 | `drag` exit 11 "cua-driver drag failed" | Cua failed after it may have started the gesture; check the screen before retrying. `cua-driver doctor`. |
 | sudo/pacman hangs when the bot runs it | No TTY for the password; run that command yourself. |

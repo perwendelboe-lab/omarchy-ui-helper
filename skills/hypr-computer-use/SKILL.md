@@ -16,7 +16,7 @@ Some Omarchy versions do not preinstall the Grok Bot app. `hypr-hands grokbot st
 
 ## Backend order
 1. **Cua Driver first** (skill `cua-driver-local-computer-use`): accessibility actions, no pointer takeover. End with `end_session`.
-2. **Pointer/keyboard fallback**: `hypr-hands move|click|scroll|drag|type|key` (wlrctl for click/scroll; ydotool only with `HYPR_HANDS_ALLOW_UINPUT=1`).
+2. **Pointer/keyboard fallback**: `hypr-hands move|click|scroll|drag|type|key` (click/scroll need ydotool with `HYPR_HANDS_ALLOW_UINPUT=1`, hypruse, or a wlrctl you already have; never suggest installing wlrctl, it is AUR-only).
 3. **Drag**: `hypr-hands drag` uses the Cua Driver desktop drag first (`backend:"cua-driver-vptr"`, a real held press over the Wayland virtual pointer) when the cua-driver daemon runs, and falls back to ydotool only with `HYPR_HANDS_ALLOW_UINPUT=1`. `hypr-hands check` → `drag_backend` shows which one applies. A drag takes over the user's pointer, so ask first.
 
 ## Loop: observe → act → verify

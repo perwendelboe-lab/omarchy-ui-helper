@@ -8,7 +8,7 @@ Run via Shell with the user's Omarchy `machineId`. Coordinates are **logical** p
 ```bash
 export HYPR_HANDS_REQUIRE_CLASS=<target-class-prefix>   # always
 hypr-hands move X Y             # Lua hl.dsp.cursor.move + ±2px verify (exit 4 on mismatch)
-hypr-hands click [left|right|middle] [X Y]   # wlrctl; exit 5 = no backend, 3 = locked, 8 = guard
+hypr-hands click [left|right|middle] [X Y]   # needs a backend (ydotool opt-in, hypruse, or existing wlrctl; never install wlrctl, it is AUR-only); exit 5 = no backend, 3 = locked, 8 = guard
 hypr-hands scroll up|down|left|right [steps] # 15 units = 1 wheel notch
 hypr-hands drag X1 Y1 X2 Y2 [steps]          # Cua Driver held drag first; JSON says "backend"
 HYPR_HANDS_ALLOW_UINPUT=1 hypr-hands drag X1 Y1 X2 Y2   # also allows the ydotool fallback
