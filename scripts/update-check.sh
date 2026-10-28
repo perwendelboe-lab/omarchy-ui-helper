@@ -23,11 +23,9 @@ major(){ # 1 if major bump (for 0.x: minor bump counts as major)
   local i=$1 l=$2; [[ -z $i || -z $l ]] && { echo false; return; }
   IFS=. read -r a b _ <<<"$i"; IFS=. read -r c d _ <<<"$l"
   if (( a==0 && c==0 )); then ((d>b)) && echo true || echo false; else ((c>a)) && echo true || echo false; fi; }
-pkg_latest(){ # pacman repo version, else AUR
+pkg_latest(){ # official pacman repo version only (the AUR is deliberately never consulted or suggested)
   local v; v=$(LC_ALL=C pacman -Si "$1" 2>/dev/null | awk -F': ' '/^Version/{print $2; exit}')
-  if [[ -n $v ]]; then echo "repo $v"; return; fi
-  v=$(curl -fsS "https://aur.archlinux.org/rpc/v5/info?arg[]=$1" 2>/dev/null | jq -r '.results[0].Version // empty')
-  [[ -n $v ]] && echo "aur $v"; }
+  [[ -n $v ]] && echo "repo $v"; return 0; }
 items=()
 add(){ items+=("$(jq -nc --arg n "$1" --arg i "$2" --arg l "$3" --arg s "$4" --argjson m "$5" --arg src "$6" --arg note "$7" \
   '{name:$n,installed:$i,latest:$l,status:$s,major_bump:$m,source:$src,note:$note}')"); }
@@ -66,12 +64,17 @@ add hyprland "$hi" "$hl_" "$hs" "$(major "$hi" "$hl_")" "github.com/hyprwm/Hyprl
 # wlrctl / ydotool (packages)
 for p in wlrctl ydotool; do
   pi=$(pacman -Q "$p" 2>/dev/null | awk '{print $2}' || true); pl=$(pkg_latest "$p" || true)
+  if [[ $p == wlrctl ]]; then  # AUR-only: report it only if the user already has it, never suggest installing it
+    [[ -z $pi ]] && continue
+    add "$p" "$pi" "" unknown false "installed outside the official repos" "AUR-only; optional. Not offered by hypr-hands. Cua Driver or ydotool replace it"; continue
+  fi
   st=$(cmp "$(semver "$pi")" "$(semver "${pl#* }")"); [[ -n $pi && $pi == "${pl#* }" ]] && st=up-to-date
-  add "$p" "$pi" "${pl#* }" "$st" false "${pl%% *}" "$( [[ ${pl%% *} == aur ]] && echo "yay -S aur/$p" || echo "sudo pacman -S $p")"
+  add "$p" "$pi" "${pl#* }" "$st" false "${pl%% *}" "sudo pacman -S $p"
 done
-# Grok Bot desktop app (package grok-bot from Omarchy's repo, or an AUR repack)
+# Grok Bot desktop app (package grok-bot from Omarchy's repo; an AUR repack is detected only to warn about it)
 gp=$(pacman -Qq grok-bot grok-bot-desktop grok-bot-bin grokbot-linux-port-bin 2>/dev/null | head -1 || true)
 if [[ -n $gp ]]; then gi=$(pacman -Q "$gp" | awk '{print $2}'); gl=$(pkg_latest "$gp" || true)
+  gaur=""; [[ $gp != grok-bot ]] && gaur=1; [[ -z $gl ]] && gl="repo $(pkg_latest grok-bot | awk '{print $2}')"
   gs=$(cmp "$(semver "$gi")" "$(semver "${gl#* }")"); [[ $gi == "${gl#* }" ]] && gs=up-to-date
   # Upstream truth: the Linux update feed the app itself follows (Omarchy's hourly sync reads the same feed).
   # pacman -Si only reflects the local sync DB, which is stale until the next `pacman -Sy`/omarchy update.
@@ -80,7 +83,7 @@ if [[ -n $gp ]]; then gi=$(pacman -Q "$gp" | awk '{print $2}'); gl=$(pkg_latest 
   gf=$(curl -fsS --max-time 15 "https://api2.cursor.sh/updates/api/update/linux-$ga/sand/0.0.0/$nil/stable" 2>/dev/null | jq -r '.version // empty' || true)
   gfs=$(cmp "$(semver "$gi")" "$gf")
   [[ $gfs == update-available && $gs != update-available ]] && gs=update-available
-  add grok-bot "$gi" "${gf:-${gl#* }}" "$gs" false "feed $ga; ${gl%% *} $gp ${gl#* }" "$( [[ ${gl%% *} == aur ]] && echo "yay -S $gp" || echo "sudo pacman -Syu $gp (or omarchy update); if the repo lags the feed, wait ~1h for Omarchy's sync")"
+  add grok-bot "$gi" "${gf:-${gl#* }}" "$gs" false "feed $ga; ${gl%% *} $gp ${gl#* }" "$( [[ -n $gaur ]] && echo "$gp is not from Omarchy's official repo (likely the AUR). Replace it with the official package: sudo pacman -Rns $gp && omarchy-pkg-add grok-bot" || echo "sudo pacman -Syu $gp (or omarchy update); if the repo lags the feed, wait ~1h for Omarchy's sync")"
 else add grok-bot "" "" not-installed false "-" "not installed; see: hypr-hands grokbot install-help"; fi
 # hypr-hands: installed copy (~/.local/share/hypr-hands/.source) or git clone, vs GitHub main
 UPSTREAM=${HYPR_HANDS_REPO:-https://github.com/perwendelboe-lab/omarchy-ui-helper}

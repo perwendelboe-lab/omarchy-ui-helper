@@ -35,10 +35,9 @@ if ((${#need[@]}==0)); then echo "  all present"
 elif ((PKGS)) && ask "Install ${need[*]} with pacman?" y; then run "sudo pacman -S --needed ${need[*]}"
 else echo "  skipped; later: sudo pacman -S --needed ${need[*]}"; fi
 
-b "3/7 Click/scroll backend: wlrctl (AUR via yay)"
+b "3/7 Click/scroll backend (no AUR packages are ever installed or suggested)"
 if have wlrctl; then echo "  present: $(command -v wlrctl)"
-elif ((PKGS)) && have yay && ask "Install wlrctl from the AUR with yay?" y; then run "yay -S --needed aur/wlrctl"
-else echo "  skipped; later: yay -S aur/wlrctl  (if yay says 'nothing to do', use the aur/ prefix)"; fi
+else echo "  no wlrctl (it is AUR-only, so it is not offered). Clicks use Cua Driver (step 4) or, opt-in, ydotool from the official Arch repo (step 5)."; fi
 
 b "4/7 Optional: Cua Driver (accessibility-first automation, by trycua)"
 echo "  Official installer: /bin/bash -c \"\$(curl -fsSL https://cua.ai/driver/install.sh)\" -> ~/.local/bin/cua-driver"

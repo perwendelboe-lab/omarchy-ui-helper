@@ -76,13 +76,12 @@ Grok Bot desktop app on Omarchy / Arch. The official Linux build is a .deb (http
 Some Omarchy versions do not preinstall it. Pick the first that works:
 1. Omarchy repo (Omarchy 4.x, when `pacman -Si grok-bot` finds it):
      Omarchy menu > Install > AI > Grok Bot      or:  omarchy-pkg-add grok-bot
-2. AUR, repackaged from the official .deb:          yay -S grok-bot-desktop
-3. Build Omarchy's PKGBUILD yourself (downloads the official .deb from downloads.cursor.com
+2. Build Omarchy's PKGBUILD yourself (downloads the official .deb from downloads.cursor.com
    and checks its sha256, unpacks it with bsdtar, installs with pacman):
      git clone --depth 1 https://github.com/omacom/omarchy-pkgs ~/code/omarchy-pkgs
      cd ~/code/omarchy-pkgs/pkgbuilds/grok-bot && makepkg -si
-4. Any .deb you downloaded yourself, converted with debtap:
-     yay -S debtap && sudo debtap -u && debtap -q grok-bot_*_amd64.deb && sudo pacman -U grok-bot-*.pkg.tar.zst
+Not offered on purpose: AUR repacks (grok-bot-desktop, debtap and similar). The AUR has had
+malware incidents and its packages run arbitrary build scripts; use the two routes above.
 Then: hypr-hands grokbot bind   (adds SUPER + CTRL + G)   and open it with: grokbot
 H
   ;;

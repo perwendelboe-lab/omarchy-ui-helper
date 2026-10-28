@@ -30,12 +30,8 @@ pacman -Si grok-bot && omarchy-pkg-add grok-bot
 git clone --depth 1 https://github.com/omacom/omarchy-pkgs ~/code/omarchy-pkgs
 cd ~/code/omarchy-pkgs/pkgbuilds/grok-bot && makepkg -si
 
-# 3. AUR repack of the official .deb (community maintained; read the PKGBUILD first)
-yay -S grok-bot-desktop
-
-# 4. A .deb you already downloaded, converted with debtap (AUR)
-yay -S debtap && sudo debtap -u
-debtap -q grok-bot_*_amd64.deb && sudo pacman -U grok-bot-*.pkg.tar.zst
+# Not offered on purpose: AUR repacks (grok-bot-desktop) and debtap. The AUR has had malware incidents and its
+# packages run arbitrary build scripts, so hypr-hands never suggests or installs from it.
 ```
 
 Then open it, sign in and register the machine with Grok Bot. Once hypr-hands is installed you also get a `grokbot` launcher (opens Grok Bot, or focuses it if it is already running) and a one-shot binding helper:

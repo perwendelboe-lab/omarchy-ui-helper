@@ -2,6 +2,10 @@
 
 All notable changes to hypr-hands. Versions follow SemVer.
 
+## 0.6.3 — 2026-10-28
+### Changed
+- hypr-hands no longer installs or suggests anything from the AUR (it has had malware incidents and its packages run arbitrary build scripts). `install.sh` stops offering wlrctl (AUR-only); clicks use Cua Driver or, opt-in, ydotool from the official Arch repo. `grokbot install-help` lists only Omarchy's package and Omarchy's PKGBUILD (the AUR repack and debtap are gone). `update-check` never queries the AUR, reports wlrctl only if already installed, and warns if the Grok Bot app is an AUR package, with the command to switch to the official `grok-bot`. The skills tell the bot never to suggest AUR packages or helpers.
+
 ## 0.6.2 — 2026-10-28
 ### Fixed
 - `update-check` and `breaking-watch` handle the Omarchy release-candidate package version (`4.5.0rc2-1` = tag `v4.5.0-rc2`). Before, an RC install was reported as "ahead" of stable and `breaking-watch` scanned the whole commit history. Tags now sort so `v4.5.0` is newer than `v4.5.0-rc2`.

@@ -51,12 +51,8 @@ pacman -Si grok-bot && omarchy-pkg-add grok-bot
 git clone --depth 1 https://github.com/omacom/omarchy-pkgs ~/code/omarchy-pkgs
 cd ~/code/omarchy-pkgs/pkgbuilds/grok-bot && makepkg -si
 
-# 3. AUR repack of the official .deb (community maintained; read the PKGBUILD first)
-yay -S grok-bot-desktop
-
-# 4. A .deb you already downloaded, converted with debtap (AUR)
-yay -S debtap && sudo debtap -u
-debtap -q grok-bot_*_amd64.deb && sudo pacman -U grok-bot-*.pkg.tar.zst
+# Not offered on purpose: AUR repacks (grok-bot-desktop) and debtap. The AUR has had malware incidents and its
+# packages run arbitrary build scripts, so hypr-hands never suggests or installs from it.
 ```
 
 Then open it, sign in and register the machine with Grok Bot. Once hypr-hands is installed you also get a `grokbot` launcher (opens Grok Bot, or focuses it if it is already running) and a one-shot binding helper:
@@ -86,14 +82,14 @@ and a shell alias if you like: `echo "alias grokbot='omarchy-launch-or-focus ^gr
 
 1. **Create the bot** from the Grok Bot template: https://x.ai/bot/34-oSa3xbDgnKAt8G_nq_
 2. **Connect your Omarchy computer** to Grok Bot: install the Grok Bot desktop app (see [Install the Grok Bot desktop app first](#install-the-grok-bot-desktop-app-first) or [`docs/install-grok-bot.md`](docs/install-grok-bot.md)), sign in and register the machine.
-3. **Ask the bot to set itself up.** It runs the installer on your machine for you (`install.sh --yes --no-packages`) and tells you the one-line `sudo pacman …` / `yay …` command for anything missing (sudo needs your terminal).
+3. **Ask the bot to set itself up.** It runs the installer on your machine for you (`install.sh --yes --no-packages`) and tells you the one-line `sudo pacman …` command for anything missing (sudo needs your terminal).
 
 Manual install on the Omarchy machine:
 
 ```bash
 git clone https://github.com/perwendelboe-lab/omarchy-ui-helper ~/code/omarchy-ui-helper && ~/code/omarchy-ui-helper/install.sh
 ```
-`install.sh` flags: `--dry-run`, `--yes`/`--non-interactive`, `--with-cua`, `--with-ydotool`, `--no-packages`, `--no-copy`. Steps: detect Omarchy/Hyprland/Wayland → pacman packages (`grim slurp wl-clipboard tesseract tesseract-data-eng jq wtype`) → `yay -S aur/wlrctl` → optional Cua Driver → optional ydotool → copy to `~/.local/share/hypr-hands` + `hypr-hands` and `grokbot` in `~/.local/bin` → `hypr-hands check` and a Grok Bot app check. It never edits your Hyprland config; `hypr-hands grokbot bind` does that only when you run it.
+`install.sh` flags: `--dry-run`, `--yes`/`--non-interactive`, `--with-cua`, `--with-ydotool`, `--no-packages`, `--no-copy`. Steps: detect Omarchy/Hyprland/Wayland → pacman packages (`grim slurp wl-clipboard tesseract tesseract-data-eng jq wtype`) → optional Cua Driver → optional ydotool → copy to `~/.local/share/hypr-hands` + `hypr-hands` and `grokbot` in `~/.local/bin` → `hypr-hands check` and a Grok Bot app check. It never edits your Hyprland config; `hypr-hands grokbot bind` does that only when you run it.
 Update: `git -C ~/code/omarchy-ui-helper pull && ~/code/omarchy-ui-helper/install.sh --yes --no-packages`. Remove: `./uninstall.sh` (`--ydotool`, `--cua`, `--packages`, `--dry-run`).
 
 ## Compatibility (Omarchy channels)
@@ -103,8 +99,8 @@ Update: `git -C ~/code/omarchy-ui-helper pull && ~/code/omarchy-ui-helper/instal
 | Hyprland | 0.56.2 (Lua config) | 0.56.x (Lua config) | classic hyprlang |
 | Dispatch used | `hyprctl repl` + `hl.dsp.*` | same | `hyprctl dispatch …` (auto-detected; untested live) |
 | `omarchy-menu-keybindings`, `omarchy` CLI, `omarchy-menu` layer, `/usr/share/omarchy/default/agents/skills/omarchy` | ✅ | ✅ | menus differ; not covered |
-| Packages (grim, wtype, tesseract, ydotool from Arch/Omarchy mirrors; wlrctl from AUR) | ✅ | ✅ | ✅ |
-| Grok Bot desktop app | `grok-bot` package / Install > AI | `grok-bot` package where the repo has it, else PKGBUILD/AUR | PKGBUILD/AUR/debtap |
+| Packages (grim, wtype, tesseract, ydotool from Arch/Omarchy mirrors; nothing from the AUR) | ✅ | ✅ | ✅ |
+| Grok Bot desktop app | `grok-bot` package / Install > AI | `grok-bot` package where the repo has it, else Omarchy's PKGBUILD | Omarchy's PKGBUILD |
 | `grokbot` launcher + `Super + Ctrl + G` (`hypr-hands grokbot bind`) | `bindings.lua` | `bindings.lua` | `bindings.conf` (or `hyprland.conf`) |
 
 Force a style with `HYPR_HANDS_DISPATCH=lua|classic`; `HYPR_HANDS_DRYRUN=1` prints dispatch commands instead of running them.
@@ -179,7 +175,7 @@ Only needed as a fallback: `drag` uses Cua Driver when its daemon runs (see abov
 | `hyprctl dispatch movecursor 100 100` → Lua `')' expected` | Lua-config Hyprland routes `dispatch` through `hl.dispatch`. Use `hyprctl repl "hl.dispatch(hl.dsp.cursor.move({ x = 100, y = 100 })); return 'ok'"` (named fields). Also `hl.dsp.focus({ window = 'address:0x…' })`, `hl.dsp.window.move({ workspace = '3', follow = false })`, `hl.dsp.window.fullscreen()`, `hl.dsp.window.close()`, `hl.dsp.window.float({ action = 'toggle' })`, `hl.dsp.window.resize({ x, y, relative })`, `hl.dsp.window.swap({ direction = 'l' })`, `hl.dsp.layout('togglesplit')`. |
 | `/dev/uinput` not writable after setup | New login needed for the `input` group; check `id -nG`. |
 | ydotool "failed to connect socket" | Arch user unit uses `$XDG_RUNTIME_DIR/.ydotool_socket`; scripts auto-detect, else `export YDOTOOL_SOCKET=…`. |
-| `yay -S wlrctl` says "nothing to do" | Use `yay -S aur/wlrctl`. |
+| `click` says no backend | Use Cua Driver (`install.sh --with-cua`) or opt in to ydotool (`sudo pacman -S ydotool`, `HYPR_HANDS_ALLOW_UINPUT=1`). wlrctl is AUR-only and not offered. |
 | `grokbot` exit 10 "Grok Bot desktop app not found" | Install the app first: `hypr-hands grokbot install-help`. |
 | `Super + Ctrl + G` does nothing | `hypr-hands grokbot status` → `keybinding.installed`; check `hyprctl binds` for a clash, then `hyprctl reload`. |
 | `hypr-hands: command not found` | Add `~/.local/bin` to PATH or call `~/.local/share/hypr-hands/bin/hypr-hands`. |

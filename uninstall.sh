@@ -4,7 +4,7 @@ set -euo pipefail
 #   ./uninstall.sh              remove ~/.local/share/hypr-hands, the hypr-hands CLI and caches
 #   --ydotool                   also undo the ydotool setup (udev rule, input group, user unit)
 #   --cua                       also stop/disable the cua-driver user unit and remove Cua Driver
-#   --packages                  print pacman/yay removal commands (never run automatically)
+#   --packages                  print pacman removal commands (never run automatically)
 #   --dry-run                   print, change nothing      --yes   don't ask
 DRY=0 YES=0 YDO=0 CUA=0 PK=0
 for a in "$@"; do case $a in --dry-run) DRY=1;; --yes|-y) YES=1;; --ydotool) YDO=1;; --cua) CUA=1;; --packages) PK=1;;
@@ -33,6 +33,5 @@ if ((CUA)) && ask "Remove Cua Driver (user unit + ~/.cua-driver + ~/.local/bin/c
   run "rm -rf ~/.cua-driver ~/.local/bin/cua-driver ~/.cache/cua-driver"
 fi
 if ((PK)); then echo "== Packages (run yourself if unused elsewhere)"
-  echo "  sudo pacman -Rns wtype tesseract tesseract-data-eng   # grim/slurp/wl-clipboard/jq are used by Omarchy itself, keep them"
-  echo "  yay -Rns wlrctl"; fi
+  echo "  sudo pacman -Rns wtype tesseract tesseract-data-eng   # grim/slurp/wl-clipboard/jq are used by Omarchy itself, keep them"; fi
 echo "Repo left at $ROOT (delete it yourself if you want)."

@@ -6,7 +6,7 @@ require_unlocked
 backend=none
 if have wlrctl; then backend=wlrctl; elif have hypruse; then backend=hypruse
 elif have ydotool && [[ ${HYPR_HANDS_ALLOW_UINPUT:-0} == 1 ]]; then backend=ydotool; fi
-[[ $backend == none ]] && die "no click backend: install wlrctl (yay -S wlrctl) or hypruse, or opt in to ydotool with HYPR_HANDS_ALLOW_UINPUT=1" 5
+[[ $backend == none ]] && die "no click backend: install ydotool (sudo pacman -S ydotool) and opt in with HYPR_HANDS_ALLOW_UINPUT=1, or use hypruse or Cua Driver" 5
 if [[ $# -ge 3 ]]; then "$(dirname "$0")/move.sh" "$2" "$3" >/dev/null || die "cursor verify failed before click" 4; fi
 guard_target
 case $backend in

@@ -22,6 +22,6 @@ update, restart services or send any input.
    - check.sh problems (click_backend none, cua-driver service not active, locked=true).
 3. For each update, give the exact command I would run (cua-driver: `cua-driver update --apply`
    then `systemctl --user restart cua-driver.service`; Omarchy/Hyprland: `omarchy update`;
-   AUR: `yay -S aur/<pkg>`; Grok Bot desktop app: `sudo pacman -S grok-bot` (or `yay -S <pkg>` for an AUR repack); hypr-hands: `git -C ~/code/omarchy-ui-helper pull && ~/code/omarchy-ui-helper/install.sh --yes --no-packages`). Do not run them.
+   Grok Bot desktop app: `sudo pacman -Syu grok-bot` or `omarchy update`; never suggest AUR packages (yay, paru, debtap), even if asked what else exists: say they are not recommended; hypr-hands: `git -C ~/code/omarchy-ui-helper pull && ~/code/omarchy-ui-helper/install.sh --yes --no-packages`). Do not run them.
 4. If nothing changed and no hits: reply with one line "hypr-hands: all current, no breaking notes".
 ```
